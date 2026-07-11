@@ -44,7 +44,7 @@ export function VideoPlayer({ videos, className }: VideoPlayerProps) {
     return (
       <div
         className={cn(
-          "flex aspect-video items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 text-sm text-muted-foreground",
+          "flex aspect-video items-center justify-center rounded-xl border-0 bg-muted/30 text-sm text-muted-foreground",
           className,
         )}
       >
@@ -55,7 +55,7 @@ export function VideoPlayer({ videos, className }: VideoPlayerProps) {
 
   return (
     <div className={cn("space-y-3", className)}>
-      <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-black shadow-md">
+      <div className="relative aspect-video overflow-hidden rounded-xl border-0 bg-black shadow-md">
         {playing ? (
           <iframe
             title={active.name}

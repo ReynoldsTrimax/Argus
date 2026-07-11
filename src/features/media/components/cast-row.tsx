@@ -52,7 +52,7 @@ export function CastRow({
               href={mediaHref("person", person.id)}
               className="group w-28 shrink-0 rounded-xl transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-border/60 bg-muted shadow-sm transition-shadow duration-300 group-hover:shadow-md group-hover:shadow-primary/10">
+              <div className="relative aspect-[2/3] overflow-hidden rounded-xl border-0 bg-muted shadow-sm transition-shadow duration-300 group-hover:shadow-md group-hover:shadow-primary/10">
                 {src ? (
                   <Image
                     src={src}

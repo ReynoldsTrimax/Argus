@@ -23,7 +23,7 @@ export default async function MarketingLayout({
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <footer className="border-t border-border bg-card py-10">
+      <footer className="border-t border-border/30 bg-muted/30 py-10 dark:bg-white/[0.03]">
         <div className="content-container flex flex-col items-center justify-between gap-3 text-sm text-muted-foreground sm:flex-row">
           <p>&copy; {new Date().getFullYear()} Argus. Built for long sessions.</p>
           <p className="text-xs tracking-wide">Your calm cinematic hub</p>

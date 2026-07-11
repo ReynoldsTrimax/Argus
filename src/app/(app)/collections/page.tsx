@@ -42,7 +42,7 @@ export default async function CollectionsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((c) => (
             <Link key={c.id} href={ROUTES.collectionDetail(c.id)}>
-              <Card className="h-full transition-colors hover:border-primary/40">
+              <Card className="h-full transition-colors ">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base">{c.name}</CardTitle>

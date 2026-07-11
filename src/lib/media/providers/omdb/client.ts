@@ -1,15 +1,7 @@
 /**
  * OMDb client — IMDb, Rotten Tomatoes, and Metacritic ratings.
  * Free key: https://www.omdbapi.com/apikey.aspx
- *
- * Uses public DNS resolution when system DNS is unreliable (same posture as TMDB client).
  */
-
-import { Resolver } from "node:dns/promises";
-import https from "node:https";
-
-const PUBLIC_DNS = ["8.8.8.8", "1.1.1.1", "9.9.9.9"];
-const REQUEST_TIMEOUT_MS = 12_000;
 
 export interface OmdbRatingSource {
   Source: string;
@@ -33,56 +25,40 @@ export function isOmdbConfigured(): boolean {
   return Boolean(process.env.OMDB_API_KEY?.trim());
 }
 
-const resolver = new Resolver();
-resolver.setServers(PUBLIC_DNS);
+async function omdbFetch(params: Record<string, string>): Promise<OmdbResponse | null> {
+  const key = process.env.OMDB_API_KEY?.trim();
+  if (!key) return null;
 
-type IpCache = { ips: string[]; expiresAt: number };
-let ipCache: IpCache | null = null;
-
-async function resolveHost(hostname: string): Promise<string[]> {
-  if (ipCache && ipCache.expiresAt > Date.now()) return ipCache.ips;
-  try {
-    const ips = await resolver.resolve4(hostname);
-    if (ips.length) {
-      ipCache = { ips, expiresAt: Date.now() + 5 * 60_000 };
-      return ips;
-    }
-  } catch {
-    // fall through
+  const url = new URL("https://www.omdbapi.com/");
+  url.searchParams.set("apikey", key);
+  for (const [k, v] of Object.entries(params)) {
+    if (v) url.searchParams.set(k, v);
   }
-  return [];
-}
 
-function httpsGet(url: URL): Promise<{ status: number; body: string }> {
-  return new Promise(async (resolve, reject) => {
-    const ips = await resolveHost(url.hostname);
-    const host = ips[0] ?? url.hostname;
-    const req = https.request(
-      {
-        host,
-        servername: url.hostname,
-        path: `${url.pathname}${url.search}`,
-        method: "GET",
-        headers: { Host: url.hostname, Accept: "application/json" },
-        timeout: REQUEST_TIMEOUT_MS,
-      },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on("data", (c) => chunks.push(c));
-        res.on("end", () =>
-          resolve({
-            status: res.statusCode ?? 0,
-            body: Buffer.concat(chunks).toString("utf8"),
-          }),
-        );
-      },
-    );
-    req.on("timeout", () => {
-      req.destroy(new Error("OMDb request timed out"));
+  try {
+    const res = await fetch(url.toString(), {
+      // Cache ratings for a day — speeds detail pages on repeat visits
+      next: { revalidate: 60 * 60 * 24, tags: ["omdb"] },
+      headers: { Accept: "application/json" },
     });
-    req.on("error", reject);
-    req.end();
-  });
+    if (!res.ok) {
+      console.warn("[omdb] HTTP", res.status);
+      return null;
+    }
+    const data = (await res.json()) as OmdbResponse;
+    if (data.Response !== "True") {
+      console.warn("[omdb]", data.Error ?? "Response false", params);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.warn(
+      "[omdb] fetch failed",
+      params,
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  }
 }
 
 /**
@@ -91,29 +67,9 @@ function httpsGet(url: URL): Promise<{ status: number; body: string }> {
 export async function fetchOmdbByImdbId(
   imdbId: string,
 ): Promise<OmdbResponse | null> {
-  const key = process.env.OMDB_API_KEY?.trim();
-  if (!key || !imdbId) return null;
-
+  if (!imdbId) return null;
   const id = imdbId.startsWith("tt") ? imdbId : `tt${imdbId}`;
-  const url = new URL("https://www.omdbapi.com/");
-  url.searchParams.set("i", id);
-  url.searchParams.set("apikey", key);
-  url.searchParams.set("plot", "short");
-
-  try {
-    const res = await httpsGet(url);
-    if (res.status < 200 || res.status >= 300) return null;
-    const data = JSON.parse(res.body) as OmdbResponse;
-    if (data.Response !== "True") return null;
-    return data;
-  } catch (error) {
-    console.warn(
-      "[omdb] fetch failed",
-      imdbId,
-      error instanceof Error ? error.message : error,
-    );
-    return null;
-  }
+  return omdbFetch({ i: id, plot: "short" });
 }
 
 /**
@@ -124,27 +80,12 @@ export async function fetchOmdbByTitle(
   year?: string | null,
   type?: "movie" | "series",
 ): Promise<OmdbResponse | null> {
-  const key = process.env.OMDB_API_KEY?.trim();
-  if (!key || !title.trim()) return null;
-
-  const url = new URL("https://www.omdbapi.com/");
-  url.searchParams.set("t", title.trim());
-  url.searchParams.set("apikey", key);
-  if (year) url.searchParams.set("y", year.slice(0, 4));
-  if (type) url.searchParams.set("type", type);
-
-  try {
-    const res = await httpsGet(url);
-    if (res.status < 200 || res.status >= 300) return null;
-    const data = JSON.parse(res.body) as OmdbResponse;
-    if (data.Response !== "True") return null;
-    return data;
-  } catch (error) {
-    console.warn(
-      "[omdb] title search failed",
-      title,
-      error instanceof Error ? error.message : error,
-    );
-    return null;
-  }
+  if (!title.trim()) return null;
+  const params: Record<string, string> = {
+    t: title.trim(),
+    plot: "short",
+  };
+  if (year) params.y = year.slice(0, 4);
+  if (type) params.type = type;
+  return omdbFetch(params);
 }

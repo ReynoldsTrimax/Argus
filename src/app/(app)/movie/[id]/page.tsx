@@ -6,7 +6,6 @@ import { DetailHero } from "@/features/media/components/detail-hero";
 import { MediaMeta } from "@/features/media/components/media-meta";
 import { CastRow } from "@/features/media/components/cast-row";
 import { MediaRow } from "@/features/media/components/media-row";
-import { MediaGallery } from "@/features/media/components/media-gallery";
 import { StreamingProviders } from "@/features/media/components/streaming-providers";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -151,8 +150,6 @@ export default async function MovieDetailPage({ params }: PageProps) {
         <div className="min-w-0 max-w-full space-y-10 overflow-x-hidden">
           <CastRow people={movie.cast} />
 
-          <MediaGallery images={movie.images} />
-
           {movie.recommendations.length ? (
             <MediaRow title="Recommendations" items={movie.recommendations} />
           ) : null}
@@ -173,7 +170,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
 
           {decision ? <DecisionScoreCard decision={decision} /> : null}
 
-          <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+          <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
             <h2 className="mb-3 text-sm font-semibold">Details</h2>
             <MediaMeta
               items={[
@@ -198,7 +195,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
           </div>
 
           {movie.productionCompanies.length ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-3 text-sm font-semibold">Production</h2>
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 {movie.productionCompanies.map((c) => (
@@ -209,7 +206,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
           ) : null}
 
           {movie.collection ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-2 text-sm font-semibold">Collection</h2>
               <Link
                 href={mediaHref("collection", movie.collection.id)}
@@ -221,7 +218,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
           ) : null}
 
           {movie.keywords.length ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-3 text-sm font-semibold">Keywords</h2>
               <div className="flex flex-wrap gap-1.5">
                 {movie.keywords.slice(0, 20).map((k) => (
@@ -235,7 +232,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
 
           <StreamingProviders availability={movie.streaming} />
 
-          <div className="rounded-3xl border border-border bg-muted/40 border-dashed p-5">
+          <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] bg-muted/30 dark:bg-white/[0.04] p-5">
             <h2 className="text-sm font-semibold">Awards</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Awards data will appear here when an awards provider is connected.

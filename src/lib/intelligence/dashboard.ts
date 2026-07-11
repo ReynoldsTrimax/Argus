@@ -25,13 +25,20 @@ export async function getDashboardPayload(
   const [
     continueWatching,
     recentlyWatched,
-    watchlist,
+    planToWatch,
+    dropped,
     favorites,
     recommendations,
   ] = await Promise.all([
-    getContinueWatching(userId, 12),
-    listLibrary(userId, { sort: "last_watched", pageSize: 12 }),
+    getContinueWatching(userId, 8),
+    // Only completed — fixed size so the rail doesn't feel endless
+    listLibrary(userId, {
+      status: "completed",
+      sort: "last_watched",
+      pageSize: 8,
+    }),
     listLibrary(userId, { status: "plan_to_watch", pageSize: 8, sort: "added" }),
+    listLibrary(userId, { status: "dropped", pageSize: 8, sort: "updated" }),
     listLibrary(userId, { status: "favorites", pageSize: 8, sort: "rating" }),
     getRecommendations(stats, data.entries, 12),
   ]);
@@ -78,16 +85,18 @@ export async function getDashboardPayload(
     }
   }
 
-  // Merge favorites into watchlist highlights if empty
+  // Merge favorites into watchlist highlights if plan-to-watch is empty
   const watchlistItems =
-    watchlist.items.length > 0 ? watchlist.items : favorites.items;
+    planToWatch.items.length > 0 ? planToWatch.items : favorites.items;
 
   return {
     stats,
     insights,
     continueWatching,
-    recentlyWatched: recentlyWatched.items,
-    watchlist: watchlistItems,
+    recentlyWatched: recentlyWatched.items.slice(0, 8),
+    planToWatch: planToWatch.items.slice(0, 8),
+    dropped: dropped.items.slice(0, 8),
+    watchlist: watchlistItems.slice(0, 8),
     recentlyRated,
     recentlyReviewed,
     pinnedCollections,

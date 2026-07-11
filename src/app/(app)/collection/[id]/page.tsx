@@ -54,7 +54,7 @@ export default async function CollectionPage({ params }: PageProps) {
 
         <div className="relative content-container flex flex-col gap-6 pb-6 pt-20 sm:flex-row sm:items-end sm:pt-28">
           {poster ? (
-            <div className="relative mx-auto aspect-[2/3] w-36 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-xl sm:mx-0 sm:w-40">
+            <div className="relative mx-auto aspect-[2/3] w-36 shrink-0 overflow-hidden rounded-xl border-0 shadow-xl sm:mx-0 sm:w-40">
               <Image src={poster} alt="" fill sizes="160px" className="object-cover" priority />
             </div>
           ) : null}

@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { RatingsDisplay } from "@/features/media/components/ratings-display";
 import { HeroTrailerBackdrop } from "@/features/media/components/hero-trailer-backdrop";
-import { logoUrl, posterUrl } from "@/lib/media/image";
+import { logoUrl } from "@/lib/media/image";
 import { formatRuntime, formatYear } from "@/lib/media/format";
 import { mediaHref } from "@/lib/media/routes";
 import type {
@@ -16,8 +16,7 @@ import type {
   MediaVideo,
   StreamingAvailability,
 } from "@/types/media";
-import { heroContainer, heroItem, scaleIn } from "@/animations/variants";
-import { springSoft } from "@/animations/motion";
+import { heroContainer, heroItem } from "@/animations/variants";
 import { StreamingProviders } from "@/features/media/components/streaming-providers";
 
 interface DetailHeroProps {
@@ -43,7 +42,7 @@ interface DetailHeroProps {
 
 /**
  * Shared cinematic hero for movie / TV detail pages.
- * Large trailer stage with poster + meta overlaid — journal lives below, not on the stage.
+ * Trailer/backdrop stage with logo + story only (no duplicate poster card).
  */
 export function DetailHero({
   title,
@@ -64,18 +63,12 @@ export function DetailHero({
   children,
 }: DetailHeroProps) {
   const reduceMotion = useReducedMotion();
-  const poster = posterUrl(posterPath, "w500");
   const logo = logoUrl(logoPath, "w500");
   const year = formatYear(releaseDate);
   const runtimeLabel = formatRuntime(runtime);
-  const hasTrailer = videos.some((v) => v.site === "YouTube" && v.key);
 
   return (
     <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
-      {/*
-        Fixed-feel stage so the trailer has a comfortable cinema viewport
-        on every screen size (object-fit: cover behavior lives inside backdrop).
-      */}
       <div className="relative min-h-[min(78vh,52rem)] w-full">
         <HeroTrailerBackdrop
           videos={videos}
@@ -91,38 +84,7 @@ export function DetailHero({
           initial={reduceMotion ? false : "hidden"}
           animate="visible"
         >
-          <div className="content-container grid gap-6 pb-8 pt-20 sm:pb-10 sm:pt-24 lg:grid-cols-[auto_1fr] lg:items-end lg:gap-8">
-            {poster ? (
-              <motion.div
-                className="relative mx-auto aspect-[2/3] w-40 shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/40 sm:mx-0 sm:w-48 lg:w-52"
-                variants={reduceMotion ? undefined : scaleIn}
-                whileHover={
-                  reduceMotion
-                    ? undefined
-                    : { y: -10, rotateY: -5, rotateX: 3, scale: 1.03 }
-                }
-                transition={springSoft}
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <Image
-                  src={poster}
-                  alt=""
-                  fill
-                  sizes="208px"
-                  className="object-cover"
-                  priority
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/15 via-transparent to-transparent" />
-                {hasTrailer ? (
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2.5 pb-2.5 pt-10">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-white/85">
-                      Cinematic backdrop
-                    </p>
-                  </div>
-                ) : null}
-              </motion.div>
-            ) : null}
-
+          <div className="content-container max-w-3xl pb-8 pt-24 sm:pb-12 sm:pt-28">
             <div className="space-y-4 text-center sm:text-left">
               {logo ? (
                 <motion.div

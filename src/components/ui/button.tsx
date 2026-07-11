@@ -21,30 +21,29 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: [
-          "bg-primary text-primary-foreground shadow-sm",
-          "border border-primary/20",
+          "border-0 bg-primary text-primary-foreground shadow-sm",
           "hover:bg-primary/90 hover:shadow-glow hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
         ].join(" "),
         destructive: [
-          "bg-destructive text-destructive-foreground shadow-sm",
+          "border-0 bg-destructive text-destructive-foreground shadow-sm",
           "hover:bg-destructive/90 hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
         ].join(" "),
         outline: [
-          "border border-border bg-card text-foreground shadow-xs",
-          "hover:bg-muted hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+          "border-0 bg-muted/50 text-foreground dark:bg-white/[0.06]",
+          "hover:bg-muted/80 dark:hover:bg-white/[0.1] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
         ].join(" "),
         secondary: [
-          "border border-transparent bg-secondary text-secondary-foreground shadow-xs",
-          "hover:bg-secondary/80 hover:shadow-sm hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+          "border-0 bg-secondary text-secondary-foreground",
+          "hover:bg-secondary/80 hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
         ].join(" "),
         ghost: [
-          "text-muted-foreground",
+          "border-0 text-muted-foreground",
           "hover:bg-muted hover:text-foreground hover:-translate-y-px motion-reduce:hover:translate-y-0",
         ].join(" "),
-        link: "text-primary underline-offset-4 hover:underline active:scale-100",
+        link: "border-0 text-primary underline-offset-4 hover:underline active:scale-100",
         glass: [
-          "border border-border bg-card text-foreground shadow-sm",
-          "hover:bg-muted hover:shadow-md hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+          "border-0 bg-muted/50 text-foreground dark:bg-white/[0.06]",
+          "hover:bg-muted/80 dark:hover:bg-white/[0.1] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
         ].join(" "),
       },
       size: {

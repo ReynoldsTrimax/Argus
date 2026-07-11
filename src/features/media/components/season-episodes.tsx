@@ -85,7 +85,7 @@ export function SeasonEpisodes({ showId, seasons }: SeasonEpisodesProps) {
             return (
               <li
                 key={ep.id}
-                className="flex min-w-0 max-w-full gap-2.5 overflow-hidden rounded-xl border border-border bg-card p-2 shadow-xs sm:gap-3 sm:p-2.5"
+                className="flex min-w-0 max-w-full gap-2.5 overflow-hidden rounded-xl border-0 bg-muted/40 p-2 dark:bg-white/[0.05] sm:gap-3 sm:p-2.5"
               >
                 <div className="relative aspect-video w-[5.5rem] shrink-0 overflow-hidden rounded-md bg-muted sm:w-28">
                   {still ? (

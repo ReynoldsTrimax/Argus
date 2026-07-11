@@ -1,39 +1,46 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { PanelLeft, PanelLeftClose } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { MAIN_NAV, SECONDARY_NAV } from "@/constants/navigation";
-import { ROUTES } from "@/constants/routes";
 import { useUI } from "@/providers/ui-provider";
-import { Logo } from "@/components/layout/logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { springSnappy } from "@/animations/motion";
 
 /**
- * App sidebar with animated active pill + soft nav motion.
+ * Icon rail that expands in place with labels on the same icons.
+ * Width is part of layout — content shifts over (no overlap).
  */
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed, setSidebarCollapsed } = useUI();
   const reduce = useReducedMotion();
+  const expanded = !sidebarCollapsed;
+
+  React.useEffect(() => {
+    if (!expanded) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSidebarCollapsed(true);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expanded, setSidebarCollapsed]);
 
   const renderLink = (
     item: (typeof MAIN_NAV)[number] | (typeof SECONDARY_NAV)[number],
-    opts?: { comingSoon?: boolean },
   ) => {
-    const comingSoon = "comingSoon" in item ? Boolean(item.comingSoon) : Boolean(opts?.comingSoon);
+    const comingSoon = "comingSoon" in item ? Boolean(item.comingSoon) : false;
     const active =
       !comingSoon &&
       (pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -45,132 +52,141 @@ export function Sidebar() {
         href={comingSoon ? "#" : item.href}
         aria-disabled={comingSoon}
         aria-current={active ? "page" : undefined}
+        aria-label={item.title}
         onClick={(e) => {
           if (comingSoon) e.preventDefault();
         }}
         className={cn(
-          "nav-pill group relative flex items-center gap-3 px-2.5 py-2.5 text-sm font-medium",
+          "nav-pill group relative flex h-10 w-full items-center rounded-xl text-sm font-medium",
+          expanded ? "gap-3 px-2.5" : "justify-center px-0",
           active
-            ? "text-primary"
-            : "text-muted-foreground hover:bg-white/8 hover:text-foreground dark:hover:bg-white/6",
+            ? "nav-pill-active"
+            : "text-muted-foreground hover:bg-muted/60 hover:text-foreground dark:hover:bg-white/[0.06]",
           comingSoon && "cursor-not-allowed opacity-55",
-          sidebarCollapsed && "justify-center px-0",
         )}
       >
-        {active && !reduce ? (
-          <motion.span
-            layoutId="sidebar-active-pill"
-            className="absolute inset-0 rounded-[var(--radius-lg)] bg-primary/12 shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.22)]"
-            transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.7 }}
-            aria-hidden
-          />
-        ) : active ? (
+        {active ? (
           <span
-            className="absolute inset-0 rounded-[var(--radius-lg)] bg-primary/12 shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.22)]"
+            className="nav-pill-active-bg absolute inset-0 rounded-xl"
             aria-hidden
           />
         ) : null}
         <Icon
           className={cn(
-            "relative z-[1] h-[1.05rem] w-[1.05rem] shrink-0 transition-transform duration-300",
-            !active && "group-hover:scale-110 group-hover:text-primary",
-            active && "text-primary",
+            "relative z-[1] h-[1.1rem] w-[1.1rem] shrink-0",
+            active
+              ? "text-[hsl(var(--nav-active-foreground))]"
+              : "group-hover:text-foreground",
           )}
           aria-hidden="true"
         />
-        {!sidebarCollapsed ? (
-          <>
-            <span className="relative z-[1] flex-1 truncate tracking-tight">
-              {item.title}
-            </span>
-            {comingSoon ? (
-              <Badge variant="muted" className="relative z-[1] text-[10px]">
-                Soon
-              </Badge>
-            ) : null}
-          </>
+        {expanded ? (
+          <span
+            className={cn(
+              "relative z-[1] min-w-0 flex-1 truncate tracking-tight",
+              active && "text-[hsl(var(--nav-active-foreground))]",
+            )}
+          >
+            {item.title}
+          </span>
+        ) : null}
+        {expanded && comingSoon ? (
+          <Badge variant="muted" className="relative z-[1] shrink-0 text-[10px]">
+            Soon
+          </Badge>
         ) : null}
       </Link>
     );
 
-    if (sidebarCollapsed) {
+    if (!expanded) {
       return (
-        <Tooltip key={item.href} delayDuration={0}>
+        <Tooltip key={item.href} delayDuration={200}>
           <TooltipTrigger asChild>{link}</TooltipTrigger>
-          <TooltipContent side="right">
-            {item.title}
-            {comingSoon ? " (coming soon)" : ""}
-          </TooltipContent>
+          <TooltipContent side="right">{item.title}</TooltipContent>
         </Tooltip>
       );
     }
-    return link;
+
+    return <React.Fragment key={item.href}>{link}</React.Fragment>;
   };
 
   return (
-    <aside
+    <motion.aside
       className={cn(
-        "sticky top-0 hidden h-dvh shrink-0 flex-col self-start",
-        "border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
-        "transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-        "md:flex",
-        sidebarCollapsed ? "w-16" : "w-60",
+        "sticky top-0 z-40 hidden h-dvh shrink-0 flex-col self-start overflow-hidden md:flex",
+        "bg-background text-sidebar-foreground",
       )}
       aria-label="Main navigation"
+      initial={false}
+      animate={{ width: expanded ? 240 : 64 }}
+      transition={
+        reduce
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 420, damping: 38, mass: 0.75 }
+      }
     >
       <div
         className={cn(
-          "flex h-[var(--header-height)] items-center border-b border-sidebar-border px-3",
-          sidebarCollapsed ? "justify-center" : "justify-between gap-2",
+          "flex h-[var(--header-height)] shrink-0 items-center",
+          expanded ? "justify-between gap-2 px-3" : "justify-center",
         )}
       >
-        <Logo
-          href={ROUTES.dashboard}
-          showWordmark={!sidebarCollapsed}
-          className={sidebarCollapsed ? "justify-center" : undefined}
-        />
-        {!sidebarCollapsed ? (
-          <motion.div whileTap={reduce ? undefined : { scale: 0.9 }} transition={springSnappy}>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-xl text-muted-foreground hover:text-foreground"
-              onClick={() => setSidebarCollapsed(true)}
-              aria-label="Collapse sidebar"
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="rounded-xl text-muted-foreground hover:text-foreground"
+          onClick={() => setSidebarCollapsed((c) => !c)}
+          aria-label={expanded ? "Collapse menu" : "Expand menu"}
+          aria-expanded={expanded}
+        >
+          {expanded ? (
+            <PanelLeftClose className="h-4 w-4" />
+          ) : (
+            <PanelLeft className="h-4 w-4" />
+          )}
+        </Button>
+        <AnimatePresence initial={false}>
+          {expanded ? (
+            <motion.span
+              key="menu-label"
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
             >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-          </motion.div>
-        ) : null}
+              Menu
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
       </div>
 
-      <ScrollArea className="flex-1 px-2.5 py-4">
-        <nav className="flex flex-col gap-1">
+      <ScrollArea className="min-h-0 flex-1">
+        <nav
+          className={cn(
+            "flex flex-col gap-1 py-2",
+            expanded ? "px-2.5" : "items-stretch px-3",
+          )}
+        >
           {MAIN_NAV.map((item) => renderLink(item))}
         </nav>
 
-        <Separator className="my-4 opacity-40" />
+        <div
+          className={cn(
+            "my-2 h-px bg-border/40",
+            expanded ? "mx-3" : "mx-auto w-8",
+          )}
+        />
 
-        <nav className="flex flex-col gap-1">
+        <nav
+          className={cn(
+            "flex flex-col gap-1 pb-3",
+            expanded ? "px-2.5" : "items-stretch px-3",
+          )}
+        >
           {SECONDARY_NAV.map((item) => renderLink(item))}
         </nav>
       </ScrollArea>
-
-      {sidebarCollapsed ? (
-        <div className="border-t border-sidebar-border p-2">
-          <motion.div whileTap={reduce ? undefined : { scale: 0.92 }} transition={springSnappy}>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="w-full rounded-xl"
-              onClick={() => setSidebarCollapsed(false)}
-              aria-label="Expand sidebar"
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </motion.div>
-        </div>
-      ) : null}
-    </aside>
+    </motion.aside>
   );
 }

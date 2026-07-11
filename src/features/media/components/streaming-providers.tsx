@@ -36,7 +36,7 @@ export function StreamingProviders({
     return (
       <div
         className={cn(
-          "rounded-2xl border border-dashed border-border bg-muted/40 p-4",
+          "rounded-2xl border-0 bg-muted/40 p-4",
           className,
         )}
       >
@@ -77,7 +77,7 @@ export function StreamingProviders({
             return (
               <li
                 key={`${p.offerType}-${p.id}`}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-xs"
+                className="inline-flex items-center gap-2 rounded-full border-0 bg-muted/50 dark:bg-white/[0.07]/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-xs"
               >
                 {logo ? (
                   <span className="relative h-5 w-5 overflow-hidden rounded-md bg-white/10">
@@ -99,7 +99,7 @@ export function StreamingProviders({
   const grouped = groupByOffer(providers);
 
   return (
-    <div className={cn("space-y-4 rounded-2xl border border-border bg-card p-5 shadow-sm", className)}>
+    <div className={cn("space-y-4 rounded-2xl border-0 bg-muted/40 p-5 dark:bg-white/[0.05]", className)}>
       <div className="flex items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 text-sm font-semibold tracking-tight">
           <MonitorPlay className="h-4 w-4 text-primary" aria-hidden />
@@ -124,7 +124,7 @@ export function StreamingProviders({
                   return (
                     <li
                       key={`${type}-${p.id}`}
-                      className="inline-flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-2.5 py-1.5 text-sm"
+                      className="inline-flex items-center gap-2 rounded-xl border-0 bg-muted/40 dark:bg-white/[0.05] px-2.5 py-1.5 text-sm"
                     >
                       {logo ? (
                         <span className="relative h-6 w-6 overflow-hidden rounded-md bg-muted">

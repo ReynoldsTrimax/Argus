@@ -29,6 +29,33 @@ const COLORS = [
   "hsl(45 90% 50%)",
 ];
 
+/** Shared tooltip — dark glass, never flashes pure white on hover. */
+const tooltipStyle: React.CSSProperties = {
+  background: "hsl(var(--popover))",
+  color: "hsl(var(--popover-foreground))",
+  border: "none",
+  borderRadius: 12,
+  fontSize: 12,
+  boxShadow: "0 12px 32px rgb(0 0 0 / 0.35)",
+  padding: "8px 12px",
+};
+
+const tooltipLabelStyle: React.CSSProperties = {
+  color: "hsl(var(--popover-foreground))",
+  fontWeight: 600,
+  marginBottom: 2,
+};
+
+const tooltipItemStyle: React.CSSProperties = {
+  color: "hsl(var(--muted-foreground))",
+};
+
+/** Soft bar hover band — muted, not solid white. */
+const barCursor = {
+  fill: "hsl(var(--muted-foreground) / 0.12)",
+  radius: 6,
+};
+
 function ChartShell({
   title,
   description,
@@ -43,7 +70,7 @@ function ChartShell({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-border bg-card/60 p-4 shadow-xs",
+        "rounded-2xl border-0 bg-muted/35 p-4 dark:bg-white/[0.04]",
         className,
       )}
     >
@@ -57,6 +84,18 @@ function ChartShell({
         {children}
       </div>
     </section>
+  );
+}
+
+function ChartTooltip() {
+  return (
+    <Tooltip
+      cursor={barCursor}
+      contentStyle={tooltipStyle}
+      labelStyle={tooltipLabelStyle}
+      itemStyle={tooltipItemStyle}
+      wrapperStyle={{ outline: "none" }}
+    />
   );
 }
 
@@ -86,12 +125,11 @@ export function GenrePieChart({ data }: { data: NamedCount[] }) {
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
-              fontSize: 12,
-            }}
+            cursor={false}
+            contentStyle={tooltipStyle}
+            labelStyle={tooltipLabelStyle}
+            itemStyle={tooltipItemStyle}
+            wrapperStyle={{ outline: "none" }}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -111,18 +149,11 @@ export function RatingBarChart({ data }: { data: RatingBucket[] }) {
     <ChartShell title="Rating distribution" description="How generously you score">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.12)" />
           <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
           <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-          <Tooltip
-            contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
-              fontSize: 12,
-            }}
-          />
-          <Bar dataKey="count" fill="hsl(38 92% 50%)" radius={[6, 6, 0, 0]} />
+          <ChartTooltip />
+          <Bar dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartShell>
@@ -143,25 +174,24 @@ export function ActivityAreaChart({ data }: { data: TimeSeriesPoint[] }) {
         <AreaChart data={data}>
           <defs>
             <linearGradient id="fillActivity" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="hsl(38 92% 50%)" stopOpacity={0.45} />
-              <stop offset="100%" stopColor="hsl(38 92% 50%)" stopOpacity={0} />
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.45} />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.12)" />
           <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
           <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
           <Tooltip
-            contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
-              fontSize: 12,
-            }}
+            cursor={{ stroke: "hsl(var(--primary) / 0.45)", strokeWidth: 1 }}
+            contentStyle={tooltipStyle}
+            labelStyle={tooltipLabelStyle}
+            itemStyle={tooltipItemStyle}
+            wrapperStyle={{ outline: "none" }}
           />
           <Area
             type="monotone"
             dataKey="value"
-            stroke="hsl(38 92% 50%)"
+            stroke="hsl(var(--primary))"
             fill="url(#fillActivity)"
             strokeWidth={2}
           />
@@ -176,18 +206,11 @@ export function WeekdayBarChart({ data }: { data: TimeSeriesPoint[] }) {
     <ChartShell title="Weekly habits" description="Which days you watch most">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.12)" />
           <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
           <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-          <Tooltip
-            contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
-              fontSize: 12,
-            }}
-          />
-          <Bar dataKey="value" fill="hsl(200 70% 50%)" radius={[6, 6, 0, 0]} />
+          <ChartTooltip />
+          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartShell>
@@ -214,7 +237,7 @@ export function NamedCountBars({
     <ChartShell title={title} description={description}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data.slice(0, 10)} layout="vertical" margin={{ left: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.12)" />
           <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
           <YAxis
             type="category"
@@ -223,15 +246,8 @@ export function NamedCountBars({
             tick={{ fontSize: 11 }}
             stroke="hsl(var(--muted-foreground))"
           />
-          <Tooltip
-            contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
-              fontSize: 12,
-            }}
-          />
-          <Bar dataKey="count" fill="hsl(280 55% 55%)" radius={[0, 6, 6, 0]} />
+          <ChartTooltip />
+          <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartShell>

@@ -4,7 +4,8 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 /**
- * Dark-only theme. Light / system modes are disabled for a consistent product look.
+ * Theme follows the OS only (prefers-color-scheme).
+ * No in-app light/dark toggle — change mode in system settings.
  */
 export function ThemeProvider({
   children,
@@ -13,9 +14,9 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="dark"
-      forcedTheme="dark"
-      enableSystem={false}
+      defaultTheme="system"
+      enableSystem
+      // Resolve system → light|dark; no forcedTheme so OS can switch live.
       disableTransitionOnChange
       {...props}
     >

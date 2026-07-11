@@ -13,7 +13,7 @@ interface MarketingHeaderProps {
  */
 export function MarketingHeader({ isAuthenticated }: MarketingHeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-black/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-30 border-b border-border/40 bg-background/70 backdrop-blur-xl">
       <div className="content-container flex h-[var(--header-height)] items-center justify-between gap-4">
         <Logo />
         <div className="flex items-center gap-2">

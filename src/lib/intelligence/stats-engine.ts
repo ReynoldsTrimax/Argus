@@ -19,6 +19,51 @@ function isCompleted(status: WatchStatus) {
   return status === "completed" || status === "rewatching";
 }
 
+/**
+ * Statuses where any logged progress counts toward episodes / hours / series.
+ * Includes dropped, paused, rewatching — not only completed + watching.
+ */
+function isEngagedStatus(status: WatchStatus) {
+  return (
+    status === "completed" ||
+    status === "rewatching" ||
+    status === "watching" ||
+    status === "paused" ||
+    status === "dropped"
+  );
+}
+
+/** True if this TV entry contributes to series / episode totals. */
+function isEngagedShow(entry: LibraryEntry, progressCount: number): boolean {
+  if (entry.media_type !== "tv") return false;
+  if (isEngagedStatus(entry.status)) return true;
+  // plan / wishlist / archived only count when progress was actually logged
+  return (entry.episodes_watched || 0) > 0 || progressCount > 0;
+}
+
+/** Episodes to credit for a TV entry (completed → full run; else logged progress). */
+function creditedEpisodes(entry: LibraryEntry): number {
+  if (entry.media_type !== "tv") return 0;
+  const watched = entry.episodes_watched || 0;
+  const total = entry.total_episodes || 0;
+  if (entry.status === "completed" || entry.status === "rewatching") {
+    return Math.max(total, watched, 0);
+  }
+  // watching, paused, dropped, plan-with-progress, etc.
+  return Math.max(watched, 0);
+}
+
+/** Per-episode minutes — TV runtime field is episode length when set. */
+function episodeMinutes(entry: LibraryEntry): number {
+  const r = entry.runtime_minutes;
+  if (typeof r === "number" && r > 0) {
+    // Guard against full-series totals stored as runtime
+    if (r > 180) return 42;
+    return r;
+  }
+  return 42;
+}
+
 function entryGenres(entry: LibraryEntry): string[] {
   const meta = entry.metadata ?? {};
   const genres = meta.genres;
@@ -91,19 +136,63 @@ export function computeUserStats(data: IntelligenceRawData): UserStats {
 
   const moviesWatched = movies.filter((e) => isCompleted(e.status)).length;
   const showsCompleted = shows.filter((e) => e.status === "completed").length;
-  const episodesWatched =
-    episodeProgress.length ||
-    shows.reduce((sum, e) => sum + (e.episodes_watched || 0), 0);
+  const showsWatching = shows.filter(
+    (e) => e.status === "watching" || e.status === "rewatching" || e.status === "paused",
+  ).length;
+  const showsDropped = shows.filter((e) => e.status === "dropped").length;
+
+  // Prefer granular episode_progress when present; always also credit entry fields
+  // so completed / watching / dropped series without progress rows still count.
+  const progressByShow = new Map<string, number>();
+  for (const ep of episodeProgress) {
+    const key = ep.entry_id;
+    progressByShow.set(key, (progressByShow.get(key) ?? 0) + 1);
+  }
+
+  // Series count: completed + watching + paused + dropped + any other with progress
+  const showsTracked = shows.filter((e) =>
+    isEngagedShow(e, progressByShow.get(e.id) ?? 0),
+  ).length;
+
+  const episodesWatched = shows.reduce((sum, e) => {
+    const fromProgress = progressByShow.get(e.id) ?? 0;
+    if (!isEngagedShow(e, fromProgress)) return sum;
+    const fromEntry = creditedEpisodes(e);
+    return sum + Math.max(fromEntry, fromProgress);
+  }, 0);
 
   const sessionMinutes = sessions.reduce(
     (sum, s) => sum + (s.duration_minutes ?? 0),
     0,
   );
   const movieMinutes = movies
-    .filter((e) => isCompleted(e.status))
-    .reduce((sum, e) => sum + (e.runtime_minutes ?? e.movie_progress_minutes ?? 0), 0);
-  // Prefer sessions; fall back to runtime estimates
-  const totalWatchMinutes = sessionMinutes > 0 ? sessionMinutes : movieMinutes + episodesWatched * 42;
+    .filter(
+      (e) =>
+        isCompleted(e.status) ||
+        e.status === "watching" ||
+        e.status === "paused" ||
+        e.status === "dropped" ||
+        (e.movie_progress_minutes ?? 0) > 0,
+    )
+    .reduce((sum, e) => {
+      if (isCompleted(e.status)) {
+        return sum + (e.runtime_minutes ?? e.movie_progress_minutes ?? 0);
+      }
+      // Partial progress while watching / paused / dropped
+      return sum + (e.movie_progress_minutes ?? 0);
+    }, 0);
+
+  const tvMinutes = shows.reduce((sum, e) => {
+    const fromProgress = progressByShow.get(e.id) ?? 0;
+    if (!isEngagedShow(e, fromProgress)) return sum;
+    const fromEntry = creditedEpisodes(e);
+    const eps = Math.max(fromEntry, fromProgress);
+    return sum + eps * episodeMinutes(e);
+  }, 0);
+
+  // Use the richer of logged sessions vs library estimates so series always count
+  const estimatedMinutes = movieMinutes + tvMinutes;
+  const totalWatchMinutes = Math.max(sessionMinutes, estimatedMinutes);
 
   const runtimes = entries
     .map((e) => e.runtime_minutes)
@@ -259,6 +348,15 @@ export function computeUserStats(data: IntelligenceRawData): UserStats {
     totals: {
       moviesWatched,
       showsCompleted,
+      /** Series currently watching / rewatching / paused. */
+      showsWatching,
+      /** Dropped series (included in showsTracked). */
+      showsDropped,
+      /**
+       * All series with real activity: completed, watching, paused, dropped,
+       * rewatching, or any status with logged episode progress.
+       */
+      showsTracked,
       episodesWatched,
       totalWatchMinutes,
       averageRuntime,

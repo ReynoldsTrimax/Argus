@@ -42,6 +42,7 @@ import {
   actionCreateCollection,
   actionLogSession,
   actionSetMovieProgress,
+  actionSetTvProgress,
 } from "@/features/library/actions/library-actions";
 import {
   WATCH_STATUS_LABELS,
@@ -54,12 +55,20 @@ import {
 } from "@/types/library";
 import { cn } from "@/lib/utils";
 
+export interface TvSeasonOption {
+  seasonNumber: number;
+  name: string;
+  episodeCount: number | null;
+}
+
 interface PersonalMediaPanelProps {
   identity: MediaIdentity;
   initial: PersonalMediaState;
   allTags: Tag[];
   allCollections: Collection[];
   ratingScale?: "five" | "ten" | "hundred";
+  /** Season list for TV progress picker (episode counts). */
+  seasons?: TvSeasonOption[];
 }
 
 /**
@@ -72,6 +81,7 @@ export function PersonalMediaPanel({
   allTags,
   allCollections,
   ratingScale = "ten",
+  seasons = [],
 }: PersonalMediaPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = React.useTransition();
@@ -90,6 +100,12 @@ export function PersonalMediaPanel({
   const [movieMinutes, setMovieMinutes] = React.useState(
     initial.entry?.movie_progress_minutes?.toString() ?? "",
   );
+  const [tvSeason, setTvSeason] = React.useState(
+    String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1),
+  );
+  const [tvEpisode, setTvEpisode] = React.useState(
+    String(initial.entry?.current_episode ?? 1),
+  );
 
   // Reset editable fields when the server payload identity changes (after router.refresh).
   const [prevKey, setPrevKey] = React.useState(formKey);
@@ -99,7 +115,20 @@ export function PersonalMediaPanel({
     setSpoilers(initial.review?.contains_spoilers ?? false);
     setRating(initial.entry?.user_rating?.toString() ?? "");
     setMovieMinutes(initial.entry?.movie_progress_minutes?.toString() ?? "");
+    setTvSeason(
+      String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1),
+    );
+    setTvEpisode(String(initial.entry?.current_episode ?? 1));
   }
+
+  const seasonOptions =
+    seasons.length > 0
+      ? seasons
+      : [{ seasonNumber: 1, name: "Season 1", episodeCount: null }];
+  const selectedSeasonMeta =
+    seasonOptions.find((s) => String(s.seasonNumber) === tvSeason) ??
+    seasonOptions[0]!;
+  const maxEpisode = Math.max(1, selectedSeasonMeta.episodeCount ?? 50);
 
   const state = initial;
 
@@ -135,7 +164,7 @@ export function PersonalMediaPanel({
   return (
     <aside
       className={cn(
-        "space-y-4 rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5",
+        "space-y-4 rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4 shadow-sm sm:p-5",
         pending && "opacity-90",
       )}
       aria-busy={pending}
@@ -279,7 +308,9 @@ export function PersonalMediaPanel({
               style={{ width: `${state.entry.progress_percent}%` }}
             />
           </div>
-          {identity.mediaType === "tv" && state.entry.current_season != null ? (
+          {identity.mediaType === "tv" &&
+          currentStatus !== "completed" &&
+          state.entry.current_season != null ? (
             <p className="text-[11px] text-muted-foreground">
               S{state.entry.current_season}E{state.entry.current_episode ?? "—"} ·{" "}
               {state.entry.episodes_watched} episodes
@@ -324,6 +355,114 @@ export function PersonalMediaPanel({
               Save
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {/* Progress picker: watching / paused / dropped (not completed — full run is assumed). */}
+      {identity.mediaType === "tv" && currentStatus !== "completed" ? (
+        <div className="space-y-2 rounded-xl border-0 bg-muted/30 dark:bg-white/[0.04] p-3">
+          <div>
+            <p className="text-xs font-medium text-foreground">Watched up to</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+              {currentStatus === "dropped"
+                ? "Log how far you got before dropping — still counts toward hours."
+                : "Set season & episode — hours go to your total watched."}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label htmlFor="tv-season" className="text-[11px] text-muted-foreground">
+                Season
+              </Label>
+              <Select
+                value={tvSeason}
+                onValueChange={(v) => {
+                  setTvSeason(v);
+                  setTvEpisode("1");
+                }}
+                disabled={pending}
+              >
+                <SelectTrigger id="tv-season" className="h-8 text-xs">
+                  <SelectValue placeholder="Season" />
+                </SelectTrigger>
+                <SelectContent>
+                  {seasonOptions.map((s) => (
+                    <SelectItem key={s.seasonNumber} value={String(s.seasonNumber)}>
+                      {s.name}
+                      {s.episodeCount != null ? ` (${s.episodeCount})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="tv-episode" className="text-[11px] text-muted-foreground">
+                Episode
+              </Label>
+              <Input
+                id="tv-episode"
+                type="number"
+                min={1}
+                max={maxEpisode}
+                value={tvEpisode}
+                onChange={(e) => setTvEpisode(e.target.value)}
+                className="h-8 text-xs"
+                disabled={pending}
+              />
+            </div>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            className="h-8 w-full text-xs"
+            disabled={pending}
+            onClick={() =>
+              run(async () => {
+                const s = Number(tvSeason);
+                const e = Number(tvEpisode);
+                if (!Number.isFinite(s) || s < 1 || !Number.isFinite(e) || e < 1) {
+                  toast.error("Enter a valid season and episode");
+                  return;
+                }
+                if (e > maxEpisode) {
+                  toast.error(`Episode must be 1–${maxEpisode} for this season`);
+                  return;
+                }
+                const res = await actionSetTvProgress(
+                  identity,
+                  s,
+                  e,
+                  seasonOptions.map((x) => ({
+                    seasonNumber: x.seasonNumber,
+                    episodeCount: x.episodeCount,
+                  })),
+                );
+                if (!res.success) {
+                  toast.error(res.error);
+                  return;
+                }
+                const hours = Math.round((res.data.minutesAdded / 60) * 10) / 10;
+                toast.success(
+                  res.data.minutesAdded > 0
+                    ? `Saved S${s}E${e} · +${hours}h added to totals`
+                    : `Progress set to S${s}E${e}`,
+                );
+              })
+            }
+          >
+            <Play className="h-3.5 w-3.5" />
+            Save episode progress
+          </Button>
+          {state.entry?.current_season != null ? (
+            <p className="text-[11px] text-muted-foreground">
+              Current: S{state.entry.current_season}E
+              {state.entry.current_episode ?? "—"} ·{" "}
+              {state.entry.episodes_watched} ep
+              {identity.runtimeMinutes
+                ? ` · ~${Math.round(((state.entry.episodes_watched || 0) * identity.runtimeMinutes) / 60)}h`
+                : ""}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -427,7 +566,7 @@ export function PersonalMediaPanel({
             {state.notes.map((n) => (
               <div
                 key={n.id}
-                className="rounded-lg border border-border/80 bg-muted/25 p-2 text-[11px]"
+                className="rounded-lg border-0 bg-muted/30 dark:bg-white/[0.04] p-2 text-[11px]"
               >
                 <p className="whitespace-pre-wrap text-foreground/90">{n.body}</p>
                 <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">

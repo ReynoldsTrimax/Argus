@@ -56,7 +56,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
         </div>
       </header>
 
-      <div className="rounded-2xl border border-border bg-card/50 p-4 sm:p-6">
+      <div className="rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4 sm:p-6">
         <ContributionHeatmap days={days} year={year} />
       </div>
 

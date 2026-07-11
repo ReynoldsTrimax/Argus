@@ -4,8 +4,8 @@ import { z } from "zod";
  * User settings schema for the settings page scaffold.
  */
 export const settingsUpdateSchema = z.object({
-  /** Product is dark-only. */
-  theme: z.literal("dark"),
+  /** Always system — light/dark follow the OS; no manual app control. */
+  theme: z.literal("system"),
   density: z.enum(["comfortable", "compact"]),
   language: z.string().min(2).max(10),
   emailNotifications: z.boolean(),

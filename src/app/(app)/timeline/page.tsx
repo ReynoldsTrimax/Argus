@@ -71,7 +71,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
             id="type"
             name="type"
             defaultValue={type}
-            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs"
+            className="flex h-10 w-full rounded-lg border-0 bg-muted/50 px-3 text-sm dark:bg-white/[0.06]"
           >
             <option value="all">All types</option>
             <option value="rated">Rated</option>
@@ -105,7 +105,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
       ) : (
         <div className="space-y-8">
           {[...groups.entries()].map(([day, dayItems]) => (
-            <section key={day} className="relative space-y-3 border-l border-border pl-5">
+            <section key={day} className="relative space-y-3 border-l border-border/25 pl-5">
               <h2 className="sticky top-16 z-10 -ml-5 bg-background/90 px-5 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur">
                 {formatDayHeading(day)}
               </h2>
@@ -113,7 +113,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
                 {dayItems.map((item) => (
                   <li
                     key={item.id}
-                    className="relative rounded-2xl border border-border bg-card shadow-xs px-4 py-3"
+                    className="relative rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] px-4 py-3"
                   >
                     <span className="absolute -left-[1.45rem] top-4 h-2.5 w-2.5 rounded-full bg-primary shadow-glow" />
                     <div className="flex flex-wrap items-center gap-2">

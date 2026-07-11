@@ -54,7 +54,7 @@ export function SmartFilters() {
   };
 
   return (
-    <div className="space-y-3 rounded-2xl border border-border bg-card/40 p-4">
+    <div className="space-y-3 rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-semibold">Smart filters</p>
         <Button type="button" variant="ghost" size="sm" onClick={clear}>

@@ -6,7 +6,7 @@ import { AlertTriangle } from "lucide-react";
 export function CatalogConfigBanner() {
   return (
     <div
-      className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm"
+      className="flex items-start gap-3 rounded-xl border-0 bg-warning/15 px-4 py-3 text-sm"
       role="status"
     >
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />

@@ -27,6 +27,7 @@ import {
   markEpisodeWatched,
   unmarkEpisode,
   logWatchSession,
+  setTvProgressPosition,
 } from "@/lib/library/progress-sessions";
 import {
   mediaIdentitySchema,
@@ -402,6 +403,42 @@ export async function actionSetMovieProgress(
     await setMovieProgress(user.id, entry.id, minutes, identity.runtimeMinutes);
     revalidateLibrary([ROUTES.movie(identity.externalId)]);
     return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+/** Set series progress to “watched up to season X episode Y”. */
+export async function actionSetTvProgress(
+  identityInput: MediaIdentity,
+  seasonNumber: number,
+  episodeNumber: number,
+  seasons: { seasonNumber: number; episodeCount: number | null }[],
+): Promise<
+  ActionResult<{
+    episodesWatched: number;
+    progressPercent: number;
+    minutesAdded: number;
+  }>
+> {
+  try {
+    const user = await requireUser();
+    const identity = mediaIdentitySchema.parse(identityInput);
+    if (identity.mediaType !== "tv") {
+      return { success: false, error: "Only TV shows support season progress" };
+    }
+    const entry = await ensureLibraryEntry(user.id, identity, {
+      status: "watching",
+    });
+    const result = await setTvProgressPosition(user.id, entry.id, {
+      seasonNumber,
+      episodeNumber,
+      seasons,
+      episodeRuntimeMinutes: identity.runtimeMinutes,
+      totalEpisodes: identity.totalEpisodes,
+    });
+    revalidateLibrary([ROUTES.show(identity.externalId), ROUTES.dashboard, ROUTES.stats]);
+    return { success: true, data: result };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : "Failed" };
   }

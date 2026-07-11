@@ -6,7 +6,6 @@ import { DetailHero } from "@/features/media/components/detail-hero";
 import { MediaMeta } from "@/features/media/components/media-meta";
 import { CastRow } from "@/features/media/components/cast-row";
 import { MediaRow } from "@/features/media/components/media-row";
-import { MediaGallery } from "@/features/media/components/media-gallery";
 import { StreamingProviders } from "@/features/media/components/streaming-providers";
 import { SeasonEpisodes } from "@/features/media/components/season-episodes";
 import { Badge } from "@/components/ui/badge";
@@ -145,7 +144,6 @@ export default async function TvDetailPage({ params }: PageProps) {
           <SeasonEpisodes showId={show.id} seasons={show.seasons} />
 
           <CastRow people={show.cast} />
-          <MediaGallery images={show.images} />
 
           {show.recommendations.length ? (
             <MediaRow title="Recommendations" items={show.recommendations} />
@@ -162,12 +160,17 @@ export default async function TvDetailPage({ params }: PageProps) {
               initial={personal}
               allTags={allTags}
               allCollections={allCollections}
+              seasons={show.seasons.map((s) => ({
+                seasonNumber: s.seasonNumber,
+                name: s.name,
+                episodeCount: s.episodeCount ?? null,
+              }))}
             />
           ) : null}
 
           {decision ? <DecisionScoreCard decision={decision} /> : null}
 
-          <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+          <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
             <h2 className="mb-3 text-sm font-semibold">Details</h2>
             <MediaMeta
               items={[
@@ -198,7 +201,7 @@ export default async function TvDetailPage({ params }: PageProps) {
           </div>
 
           {show.networks.length ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-3 text-sm font-semibold">Networks</h2>
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 {show.networks.map((n) => (
@@ -209,7 +212,7 @@ export default async function TvDetailPage({ params }: PageProps) {
           ) : null}
 
           {show.productionCompanies.length ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-3 text-sm font-semibold">Studios</h2>
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 {show.productionCompanies.map((c) => (
@@ -220,7 +223,7 @@ export default async function TvDetailPage({ params }: PageProps) {
           ) : null}
 
           {show.keywords.length ? (
-            <div className="rounded-3xl border border-border bg-card shadow-sm p-5">
+            <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-5">
               <h2 className="mb-3 text-sm font-semibold">Keywords</h2>
               <div className="flex flex-wrap gap-1.5">
                 {show.keywords.slice(0, 20).map((k) => (
@@ -234,7 +237,7 @@ export default async function TvDetailPage({ params }: PageProps) {
 
           <StreamingProviders availability={show.streaming} />
 
-          <div className="rounded-3xl border border-border bg-muted/40 border-dashed p-5">
+          <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] bg-muted/30 dark:bg-white/[0.04] p-5">
             <h2 className="text-sm font-semibold">Awards</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Awards data will appear when a provider is connected.

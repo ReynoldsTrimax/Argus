@@ -336,6 +336,9 @@ export async function listLibrary(
     case "progress":
       query = query.order("progress_percent", { ascending: false });
       break;
+    case "updated":
+      query = query.order("updated_at", { ascending: false });
+      break;
     case "last_watched":
     default:
       query = query.order("last_watched_at", { ascending: false, nullsFirst: false });

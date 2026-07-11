@@ -27,14 +27,17 @@ function subscribeSidebar(onStoreChange: () => void) {
 
 function getSidebarSnapshot(): boolean {
   try {
-    return window.localStorage.getItem(STORAGE_KEYS.sidebarCollapsed) === "true";
+    const raw = window.localStorage.getItem(STORAGE_KEYS.sidebarCollapsed);
+    // Default collapsed (true) so the rail never eats content on first visit
+    if (raw === null) return true;
+    return raw === "true";
   } catch {
-    return false;
+    return true;
   }
 }
 
 function getSidebarServerSnapshot(): boolean {
-  return false;
+  return true;
 }
 
 export function UIProvider({ children }: { children: React.ReactNode }) {

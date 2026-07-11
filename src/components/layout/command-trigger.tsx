@@ -38,9 +38,9 @@ export function CommandTrigger({ className, compact }: CommandTriggerProps) {
       onClick={() => setCommandOpen(true)}
       className={cn(
         "group inline-flex h-10 w-full max-w-md items-center gap-2.5 rounded-xl px-3.5 text-sm",
-        "border border-border bg-muted/50 text-muted-foreground shadow-xs",
+        "border-0 bg-muted/50 text-muted-foreground shadow-none backdrop-blur-md dark:bg-white/[0.06]",
         "transition-colors duration-200",
-        "hover:bg-muted hover:text-foreground",
+        "hover:bg-muted/80 hover:text-foreground dark:hover:bg-white/[0.1]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
         className,
       )}
@@ -53,7 +53,7 @@ export function CommandTrigger({ className, compact }: CommandTriggerProps) {
       <span className="flex-1 truncate text-left tracking-tight">
         Search movies, shows, people…
       </span>
-      <kbd className="pointer-events-none hidden h-6 select-none items-center gap-1 rounded-md border border-border bg-card px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:inline-flex">
+      <kbd className="pointer-events-none hidden h-6 select-none items-center gap-1 rounded-md border-0 bg-background/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground dark:bg-white/[0.08] sm:inline-flex">
         <span className="text-xs">⌘</span>K
       </kbd>
     </button>

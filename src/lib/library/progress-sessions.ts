@@ -119,6 +119,155 @@ export async function markEpisodeWatched(
   return data as EpisodeProgress;
 }
 
+/**
+ * Set “watched up to” position for a series (e.g. S2E5).
+ * Updates entry progress and logs the newly completed runtime into sessions
+ * so home hours watched increases.
+ */
+export async function setTvProgressPosition(
+  userId: string,
+  entryId: string,
+  input: {
+    seasonNumber: number;
+    episodeNumber: number;
+    seasons: { seasonNumber: number; episodeCount: number | null }[];
+    episodeRuntimeMinutes?: number | null;
+    totalEpisodes?: number | null;
+  },
+): Promise<{ episodesWatched: number; progressPercent: number; minutesAdded: number }> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const seasonNumber = Math.max(1, Math.floor(input.seasonNumber));
+  const episodeNumber = Math.max(1, Math.floor(input.episodeNumber));
+
+  const sorted = [...input.seasons]
+    .filter((s) => s.seasonNumber > 0)
+    .sort((a, b) => a.seasonNumber - b.seasonNumber);
+
+  let episodesWatched = 0;
+  for (const s of sorted) {
+    const count = Math.max(0, s.episodeCount ?? 0);
+    if (s.seasonNumber < seasonNumber) {
+      episodesWatched += count || 0;
+    } else if (s.seasonNumber === seasonNumber) {
+      const cap = count > 0 ? Math.min(episodeNumber, count) : episodeNumber;
+      episodesWatched += cap;
+      break;
+    }
+  }
+
+  // Fallback when season metadata is missing
+  if (episodesWatched === 0) {
+    episodesWatched = episodeNumber;
+  }
+
+  const { data: entry } = await table(supabase, "library_entries")
+    .select("*")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .single();
+
+  if (!entry) throw new Error("Library entry not found");
+
+  const prevWatched = Number(entry.episodes_watched ?? 0);
+  const fromSeasons = sorted.reduce((sum, s) => sum + (s.episodeCount ?? 0), 0);
+  const totalEpisodes =
+    input.totalEpisodes ??
+    (entry.total_episodes as number | null) ??
+    (fromSeasons > 0 ? fromSeasons : null);
+
+  const progress =
+    totalEpisodes && totalEpisodes > 0
+      ? Math.min(100, Math.round((episodesWatched / totalEpisodes) * 10000) / 100)
+      : 0;
+
+  const epRuntime =
+    (typeof input.episodeRuntimeMinutes === "number" && input.episodeRuntimeMinutes > 0
+      ? input.episodeRuntimeMinutes
+      : null) ??
+    (typeof entry.runtime_minutes === "number" &&
+    entry.runtime_minutes > 0 &&
+    entry.runtime_minutes <= 180
+      ? entry.runtime_minutes
+      : 42);
+
+  const deltaEpisodes = Math.max(0, episodesWatched - prevWatched);
+  const minutesAdded = deltaEpisodes * epRuntime;
+
+  // Preserve dropped — partial watch is still logged without flipping status.
+  // Plan/wishlist become watching; 100% → completed.
+  const status =
+    progress >= 100
+      ? "completed"
+      : entry.status === "dropped"
+        ? "dropped"
+        : entry.status === "plan_to_watch" || entry.status === "wishlist"
+          ? "watching"
+          : entry.status === "completed" && progress < 100
+            ? "watching"
+            : entry.status;
+
+  await table(supabase, "library_entries")
+    .update({
+      current_season: seasonNumber,
+      current_episode: episodeNumber,
+      episodes_watched: episodesWatched,
+      total_episodes: totalEpisodes,
+      progress_percent: progress,
+      runtime_minutes: entry.runtime_minutes ?? epRuntime,
+      last_watched_at: now,
+      status,
+      started_at: entry.started_at ?? now,
+      completed_at: progress >= 100 ? now : entry.completed_at,
+    })
+    .eq("id", entryId)
+    .eq("user_id", userId);
+
+  // Anchor progress on the chosen episode row
+  await table(supabase, "episode_progress").upsert(
+    {
+      user_id: userId,
+      entry_id: entryId,
+      season_number: seasonNumber,
+      episode_number: episodeNumber,
+      is_watched: true,
+      watched_at: now,
+      runtime_minutes: epRuntime,
+    },
+    { onConflict: "entry_id,season_number,episode_number" },
+  );
+
+  if (minutesAdded > 0) {
+    await table(supabase, "watch_sessions").insert({
+      user_id: userId,
+      entry_id: entryId,
+      session_date: now.slice(0, 10),
+      started_at: now,
+      ended_at: now,
+      duration_minutes: minutesAdded,
+      season_number: seasonNumber,
+      episode_number: episodeNumber,
+      is_rewatch: false,
+      notes: `Progress set to S${seasonNumber}E${episodeNumber} (+${deltaEpisodes} ep)`,
+    });
+  }
+
+  await logActivity(supabase, userId, {
+    activityType: "episode_watched",
+    summary: `Progress on ${entry.title ?? "show"}: S${seasonNumber}E${episodeNumber} (${episodesWatched} episodes)`,
+    entryId,
+    title: entry.title as string | null,
+    metadata: {
+      seasonNumber,
+      episodeNumber,
+      episodesWatched,
+      minutesAdded,
+    },
+  });
+
+  return { episodesWatched, progressPercent: progress, minutesAdded };
+}
+
 export async function unmarkEpisode(
   userId: string,
   entryId: string,

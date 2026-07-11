@@ -26,6 +26,9 @@
 
   --primary: 212 88% 48%;
   --primary-foreground: 0 0% 100%;
+  /* Same blue family as primary, stepped down for selected nav (not a foreign navy). */
+  --nav-active: 212 82% 40%;
+  --nav-active-foreground: 0 0% 100%;
 
   --secondary: 220 16% 94%;
   --secondary-foreground: 222 22% 22%;
@@ -133,6 +136,9 @@
   /* Sole accent — vivid blue */
   --primary: 210 100% 56%;
   --primary-foreground: 0 0% 100%;
+  /* Same hue as primary, deeper for selected nav so white labels stay crisp. */
+  --nav-active: 210 92% 42%;
+  --nav-active-foreground: 0 0% 100%;
 
   --secondary: 0 0% 8%;
   --secondary-foreground: 0 0% 92%;
@@ -440,6 +446,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  html {
+    color-scheme: light;
   }
 
   html.dark {
@@ -756,14 +766,14 @@
 
   .glass-dialog {
     background-color: hsl(var(--popover));
-    border: 1px solid hsl(var(--surface-border));
+    border: none;
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
   }
 
   .glass-command {
     background-color: hsl(var(--popover));
-    border: 1px solid hsl(var(--surface-border));
+    border: none;
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
   }
@@ -949,30 +959,39 @@
     }
   }
 
-  /* Premium solid cards */
+  /* Soft surface cards — fill contrast, no heavy outlines */
   .surface-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--surface-border));
-    box-shadow: var(--shadow-sm);
+    background-color: hsl(var(--muted) / 0.45);
+    border: none;
+    box-shadow: none;
     border-radius: var(--radius-xl);
     transition:
       transform var(--duration-normal) var(--ease-lux),
-      box-shadow var(--duration-normal) var(--ease-lux),
-      border-color var(--duration-normal) var(--ease-lux);
+      background-color var(--duration-normal) var(--ease-lux);
+  }
+
+  :is(.dark) .surface-card {
+    background-color: hsl(0 0% 100% / 0.05);
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .surface-card:hover {
       transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-      border-color: hsl(var(--surface-border-strong));
+      background-color: hsl(var(--muted) / 0.65);
+    }
+
+    :is(.dark) .surface-card:hover {
+      background-color: hsl(0 0% 100% / 0.08);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .surface-card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: hsl(var(--surface-border-strong));
+      background-color: hsl(var(--muted) / 0.65);
+    }
+
+    :is(.dark) .surface-card:hover {
+      background-color: hsl(0 0% 100% / 0.08);
     }
   }
 
@@ -994,10 +1013,14 @@
     }
   }
 
+  /* Selected nav: deeper brand blue + white label (same hue as --primary). */
   .nav-pill-active {
-    background-color: hsl(var(--primary) / 0.14);
-    color: hsl(var(--primary));
-    box-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.28);
+    color: hsl(var(--nav-active-foreground));
+    box-shadow: none;
+  }
+
+  .nav-pill-active-bg {
+    background-color: hsl(var(--nav-active));
   }
 
   /* High-refresh fluid motion tokens */

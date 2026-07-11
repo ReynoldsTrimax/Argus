@@ -37,8 +37,8 @@ export function GenreChips({ genres, className }: GenreChipsProps) {
             className="shrink-0 transition-transform duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"
           >
             <Badge
-              variant="outline"
-              className="h-9 cursor-pointer rounded-full px-4 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-primary/12 hover:text-foreground"
+              variant="muted"
+              className="h-9 cursor-pointer rounded-full border-0 bg-muted/70 px-4 text-sm font-medium text-foreground transition-colors hover:bg-primary/15 hover:text-foreground dark:bg-white/[0.07] dark:hover:bg-primary/20"
             >
               {g.name}
             </Badge>

@@ -36,7 +36,8 @@ interface SettingsFormProps {
 }
 
 /**
- * Settings — density, notifications, accessibility (dark theme is fixed).
+ * Settings — density, notifications, accessibility.
+ * Light/dark follows the OS; no manual theme control.
  */
 export function SettingsForm({ settings }: SettingsFormProps) {
   const [pending, startTransition] = React.useTransition();
@@ -44,7 +45,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   const form = useForm<SettingsUpdateInput>({
     resolver: zodResolver(settingsUpdateSchema),
     defaultValues: {
-      theme: "dark",
+      theme: "system",
       density: settings.density,
       language: settings.language,
       emailNotifications: settings.email_notifications,
@@ -56,7 +57,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   function onSubmit(values: SettingsUpdateInput) {
     startTransition(async () => {
       const formData = new FormData();
-      formData.set("theme", "dark");
+      formData.set("theme", "system");
       formData.set("density", values.density);
       formData.set("language", values.language);
       formData.set("emailNotifications", String(values.emailNotifications));
@@ -79,7 +80,8 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           <div>
             <h2 className="text-sm font-semibold tracking-tight">Appearance</h2>
             <p className="text-sm text-muted-foreground">
-              Argus uses a dark cinematic theme. Adjust density and motion preferences below.
+              Light and dark mode follow your system settings automatically. Adjust density
+              and motion below.
             </p>
           </div>
           <FormField
@@ -123,7 +125,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             control={form.control}
             name="emailNotifications"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
+              <FormItem className="flex items-center justify-between rounded-xl border-0 bg-muted/40 p-4 dark:bg-white/[0.05]">
                 <div className="space-y-0.5 pr-4">
                   <FormLabel>Product emails</FormLabel>
                   <FormDescription>
@@ -144,7 +146,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             control={form.control}
             name="marketingEmails"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
+              <FormItem className="flex items-center justify-between rounded-xl border-0 bg-muted/40 p-4 dark:bg-white/[0.05]">
                 <div className="space-y-0.5 pr-4">
                   <FormLabel>Marketing emails</FormLabel>
                   <FormDescription>Occasional news and feature highlights.</FormDescription>
@@ -172,7 +174,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             control={form.control}
             name="reducedMotion"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
+              <FormItem className="flex items-center justify-between rounded-xl border-0 bg-muted/40 p-4 dark:bg-white/[0.05]">
                 <div className="space-y-0.5 pr-4">
                   <FormLabel>Reduce motion</FormLabel>
                   <FormDescription>

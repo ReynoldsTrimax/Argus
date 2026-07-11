@@ -40,7 +40,7 @@ export function MobileNav() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[min(100%,20rem)] p-0">
-        <SheetHeader className="border-b border-border px-4 py-4 text-left">
+        <SheetHeader className="border-0 px-4 py-4 text-left">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <Logo href={ROUTES.dashboard} />
         </SheetHeader>
@@ -54,7 +54,7 @@ export function MobileNav() {
 
             return (
               <div key={item.href}>
-                {showSeparator ? <Separator className="my-2" /> : null}
+                {showSeparator ? <Separator className="my-2 opacity-25" /> : null}
                 <Link
                   href={item.comingSoon ? "#" : item.href}
                   aria-disabled={item.comingSoon}
@@ -67,15 +67,28 @@ export function MobileNav() {
                     setMobileNavOpen(false);
                   }}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent/70 hover:text-accent-foreground",
+                      ? "nav-pill-active-bg text-[hsl(var(--nav-active-foreground))]"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                     item.comingSoon && "cursor-not-allowed opacity-60",
                   )}
                 >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  <span className="flex-1">{item.title}</span>
+                  <Icon
+                    className={cn(
+                      "h-4 w-4",
+                      active && "text-[hsl(var(--nav-active-foreground))]",
+                    )}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className={cn(
+                      "flex-1",
+                      active && "text-[hsl(var(--nav-active-foreground))]",
+                    )}
+                  >
+                    {item.title}
+                  </span>
                   {item.comingSoon ? (
                     <Badge variant="muted" className="text-[10px]">
                       Soon

@@ -131,6 +131,7 @@ async function settledGenres(
  */
 export async function getDiscoveryHome(): Promise<{
   hero: MediaSummary | null;
+  heroItems: MediaSummary[];
   sections: DiscoverySection[];
   genres: Genre[];
 }> {
@@ -165,7 +166,20 @@ export async function getDiscoveryHome(): Promise<{
     settledGenres(provider.getMovieGenres(), "movie-genres"),
   ]);
 
-  const hero = trending.results[0] ?? popularMovies.results[0] ?? null;
+  // Prefer a rotating pool of trending + popular titles for the discover banner
+  const heroPool = [
+    ...trending.results,
+    ...popularMovies.results,
+    ...popularTv.results,
+  ];
+  const seen = new Set<string>();
+  const heroItems = heroPool.filter((item) => {
+    const key = `${item.mediaType}:${item.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return Boolean(item.backdropPath || item.posterPath);
+  }).slice(0, 12);
+  const hero = heroItems[0] ?? trending.results[0] ?? popularMovies.results[0] ?? null;
 
   // Soft approach — use top trending items as "Editor's picks" placeholder
   const editorsPicks = [...topMovies.results, ...topTv.results]
@@ -245,6 +259,7 @@ export async function getDiscoveryHome(): Promise<{
 
   return {
     hero,
+    heroItems,
     sections: filled,
     genres: movieGenres,
   };
@@ -294,6 +309,7 @@ export async function safeGetDiscoveryHome() {
   if (!isCatalogConfigured()) {
     return {
       hero: null as MediaSummary | null,
+      heroItems: [] as MediaSummary[],
       sections: [] as DiscoverySection[],
       genres: [] as Genre[],
       configured: false,
@@ -306,6 +322,7 @@ export async function safeGetDiscoveryHome() {
     console.error("[catalog] discovery home failed", error);
     return {
       hero: null as MediaSummary | null,
+      heroItems: [] as MediaSummary[],
       sections: [] as DiscoverySection[],
       genres: [] as Genre[],
       configured: true,

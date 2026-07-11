@@ -9,7 +9,7 @@ import { ROUTES } from "@/constants/routes";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border bg-card px-4 py-4 sm:px-6">
+      <header className="flex items-center justify-between border-b border-border/30 bg-background/80 px-4 py-4 sm:px-6 backdrop-blur-xl">
         <Logo href={ROUTES.home} />
       </header>
       <main

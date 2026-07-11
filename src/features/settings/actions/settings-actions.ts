@@ -15,7 +15,7 @@ export async function updateSettings(
   formData: FormData,
 ): Promise<ActionResult> {
   const parsed = settingsUpdateSchema.safeParse({
-    theme: "dark",
+    theme: "system",
     density: formData.get("density"),
     language: formData.get("language"),
     emailNotifications: formData.get("emailNotifications") === "true",
@@ -43,7 +43,7 @@ export async function updateSettings(
   const { error } = await supabase
     .from("user_settings")
     .update({
-      theme: "dark",
+      theme: "system",
       density: parsed.data.density,
       language: parsed.data.language,
       email_notifications: parsed.data.emailNotifications,

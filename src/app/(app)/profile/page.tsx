@@ -69,7 +69,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-8 animate-fade-up">
-      <section className="relative overflow-hidden rounded-3xl border border-border">
+      <section className="relative overflow-hidden rounded-3xl border-0 bg-muted/30 dark:bg-white/[0.04]">
         <div
           className="absolute inset-0 h-36 gradient-mesh dark:gradient-mesh-dark sm:h-44"
           aria-hidden
@@ -156,7 +156,7 @@ export default async function ProfilePage() {
               <li key={c.id}>
                 <Link
                   href={ROUTES.collectionDetail(c.id)}
-                  className="flex justify-between rounded-xl border border-border px-3 py-2 text-sm hover:bg-muted/40"
+                  className="flex justify-between rounded-xl border-0 bg-muted/40 px-3 py-2 text-sm hover:bg-muted/65 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]"
                 >
                   <span className="font-medium">{c.name}</span>
                   <span className="text-muted-foreground">{c.item_count}</span>

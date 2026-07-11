@@ -24,7 +24,7 @@ export function DecisionScoreCard({ decision, className }: DecisionScoreCardProp
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-card p-5 shadow-sm",
+        "rounded-2xl border-0 bg-muted/40 p-5 dark:bg-white/[0.05]",
         className,
       )}
     >

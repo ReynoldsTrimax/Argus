@@ -30,7 +30,7 @@ Command.displayName = CommandPrimitive.displayName;
 function CommandDialog({ children, ...props }: DialogProps) {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden border border-border bg-card p-0 shadow-xl sm:max-w-xl sm:rounded-2xl data-[state=open]:zoom-in-[0.995] data-[state=closed]:zoom-out-[0.995]">
+      <DialogContent className="overflow-hidden border-0 bg-popover p-0 shadow-xl sm:max-w-xl sm:rounded-2xl data-[state=open]:zoom-in-[0.995] data-[state=closed]:zoom-out-[0.995]">
         <DialogTitle className="sr-only">Command menu</DialogTitle>
         <Command className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
@@ -45,7 +45,7 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div
-    className="flex items-center border-b border-border/50 px-4"
+    className="flex items-center border-b border-border/25 px-4"
     cmdk-input-wrapper=""
   >
     <Search className="mr-3 h-5 w-5 shrink-0 text-primary/70" aria-hidden="true" />

@@ -38,7 +38,7 @@ export default async function ActivityPage() {
           {items.map((item) => (
             <li
               key={item.id}
-              className="rounded-2xl border border-border bg-muted/40 px-4 py-3"
+              className="rounded-2xl border-0 bg-muted/40 px-4 py-3 dark:bg-white/[0.05]"
             >
               <p className="text-sm">{item.summary}</p>
               <p className="mt-1 text-xs text-muted-foreground">

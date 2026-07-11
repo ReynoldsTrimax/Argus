@@ -20,6 +20,7 @@ import { LibraryPosterCard } from "@/features/library/components/library-poster-
 import { MediaRow } from "@/features/media/components/media-row";
 import { PosterCard } from "@/features/media/components/poster-card";
 import { StatCounter } from "@/features/intelligence/components/stat-counter";
+import { SeriesStatsTabs } from "@/features/intelligence/components/series-stats-tabs";
 import { InsightCards } from "@/features/intelligence/components/insight-cards";
 import { DashboardSection } from "@/features/intelligence/components/dashboard-section";
 import {
@@ -91,9 +92,9 @@ export default async function DashboardPage() {
         }
       />
 
-      {/* Hero metrics */}
+      {/* Hero metrics — equal-height tiles */}
       <ScrollReveal variant="scale">
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 stagger-children">
+        <section className="grid items-stretch gap-3 sm:grid-cols-2 xl:grid-cols-4 stagger-children">
           <StatCounter
             value={Math.round(stats.totals.totalWatchMinutes / 60)}
             label="Hours watched"
@@ -105,10 +106,12 @@ export default async function DashboardPage() {
             label="Movies finished"
             hint={`${stats.totals.librarySize} in library`}
           />
-          <StatCounter
-            value={stats.totals.episodesWatched}
-            label="Episodes watched"
-            hint={`${stats.totals.showsCompleted} series completed`}
+          <SeriesStatsTabs
+            episodesWatched={stats.totals.episodesWatched}
+            showsTracked={stats.totals.showsTracked}
+            showsCompleted={stats.totals.showsCompleted}
+            showsWatching={stats.totals.showsWatching}
+            showsDropped={stats.totals.showsDropped}
           />
           <StatCounter
             value={stats.streaks.current}
@@ -142,25 +145,49 @@ export default async function DashboardPage() {
                 className="py-10"
               />
             ) : (
-              <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
-                {dash.continueWatching.map((e) => (
-                  <div key={e.id} className="w-36 shrink-0 sm:w-40">
-                    <LibraryPosterCard entry={e} />
-                  </div>
+              <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
+                {dash.continueWatching.slice(0, 8).map((e) => (
+                  <LibraryPosterCard key={e.id} entry={e} />
                 ))}
               </div>
             )}
           </DashboardSection>
 
-          <DashboardSection title="Recently watched" href={ROUTES.history}>
+          <DashboardSection title="Recently completed" href={ROUTES.history}>
             {dash.recentlyWatched.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No recent watches yet.</p>
+              <p className="text-sm text-muted-foreground">
+                Finish a title to see it here.
+              </p>
             ) : (
-              <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
+              <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
                 {dash.recentlyWatched.map((e) => (
-                  <div key={e.id} className="w-36 shrink-0 sm:w-40">
-                    <LibraryPosterCard entry={e} />
-                  </div>
+                  <LibraryPosterCard key={e.id} entry={e} />
+                ))}
+              </div>
+            )}
+          </DashboardSection>
+
+          <DashboardSection title="Plan to watch" href={ROUTES.watchlist}>
+            {dash.planToWatch.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Queue something from Discover.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
+                {dash.planToWatch.map((e) => (
+                  <LibraryPosterCard key={e.id} entry={e} showProgress={false} />
+                ))}
+              </div>
+            )}
+          </DashboardSection>
+
+          <DashboardSection title="Dropped" href={ROUTES.library}>
+            {dash.dropped.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No dropped titles.</p>
+            ) : (
+              <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
+                {dash.dropped.map((e) => (
+                  <LibraryPosterCard key={e.id} entry={e} showProgress={false} />
                 ))}
               </div>
             )}
@@ -199,7 +226,7 @@ export default async function DashboardPage() {
           {dash.watchlist.length === 0 ? (
             <p className="text-sm text-muted-foreground">Your plan-to-watch list is empty.</p>
           ) : (
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
               {dash.watchlist.slice(0, 4).map((e) => (
                 <LibraryPosterCard key={e.id} entry={e} showProgress={false} />
               ))}
@@ -211,7 +238,7 @@ export default async function DashboardPage() {
           {dash.recentlyRated.length === 0 ? (
             <p className="text-sm text-muted-foreground">Rate a title to see it here.</p>
           ) : (
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-3 gap-3 pt-4 sm:grid-cols-4">
               {dash.recentlyRated.slice(0, 4).map((e) => (
                 <LibraryPosterCard key={e.id} entry={e} />
               ))}
@@ -260,7 +287,7 @@ export default async function DashboardPage() {
                 <li key={c.id}>
                   <Link
                     href={ROUTES.collectionDetail(c.id)}
-                    className="flex items-center justify-between rounded-2xl border border-border bg-card shadow-xs px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
+                    className="flex items-center justify-between rounded-2xl border-0 bg-muted/40 px-3 py-2.5 text-sm transition-colors hover:bg-muted/65 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]"
                   >
                     <span className="font-medium">{c.name}</span>
                     <Badge variant="muted">{c.item_count}</Badge>
@@ -279,7 +306,7 @@ export default async function DashboardPage() {
               {dash.recentlyReviewed.map(({ entry, reviewPreview }) => (
                 <li
                   key={entry.id}
-                  className="rounded-2xl border border-border bg-muted/40 px-3 py-2.5"
+                  className="rounded-2xl border-0 bg-muted/40 px-3 py-2.5 dark:bg-white/[0.05]"
                 >
                   <Link
                     href={
@@ -306,7 +333,11 @@ export default async function DashboardPage() {
         <DashboardSection title="Favorite genres" href={ROUTES.stats}>
           <div className="flex flex-wrap gap-2">
             {stats.favorites.genres.map((g) => (
-              <Badge key={g.name} variant="outline" className="h-8 rounded-full px-3">
+              <Badge
+                key={g.name}
+                variant="muted"
+                className="h-8 rounded-full border-0 bg-muted/70 px-3 text-foreground dark:bg-white/[0.07]"
+              >
                 {g.name}
                 <span className="ml-1.5 text-muted-foreground">{g.count}</span>
               </Badge>
@@ -324,7 +355,7 @@ export default async function DashboardPage() {
             {dash.activity.map((a) => (
               <li
                 key={a.id}
-                className="flex items-start justify-between gap-3 rounded-xl border border-border/80 bg-card/30 px-3 py-2 text-sm"
+                className="flex items-start justify-between gap-3 rounded-xl border-0 bg-muted/40 px-3 py-2 text-sm dark:bg-white/[0.05]"
               >
                 <span>{a.summary}</span>
                 <span className="shrink-0 text-xs text-muted-foreground">

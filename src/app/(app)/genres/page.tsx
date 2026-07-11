@@ -32,7 +32,7 @@ export default async function GenresPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {movieGenres.map((g) => (
             <Link key={`m-${g.id}`} href={`${mediaHref("genre", g.id)}?type=movie`}>
-              <Card className="h-full transition-colors hover:border-primary/40 hover:bg-card/80">
+              <Card className="h-full transition-colors hover:bg-card/80">
                 <CardHeader className="p-4">
                   <CardTitle className="text-base">{g.name}</CardTitle>
                   <CardDescription>Movies</CardDescription>
@@ -48,7 +48,7 @@ export default async function GenresPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {tvGenres.map((g) => (
             <Link key={`t-${g.id}`} href={`${mediaHref("genre", g.id)}?type=tv`}>
-              <Card className="h-full transition-colors hover:border-primary/40 hover:bg-card/80">
+              <Card className="h-full transition-colors hover:bg-card/80">
                 <CardHeader className="p-4">
                   <CardTitle className="text-base">{g.name}</CardTitle>
                   <CardDescription>TV Shows</CardDescription>

@@ -105,7 +105,7 @@ export function MediaGallery({ images, className }: MediaGalleryProps) {
                       type="button"
                       onClick={() => openAt(list, i)}
                       className={cn(
-                        "relative overflow-hidden rounded-lg border border-border bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "relative overflow-hidden rounded-lg border-0 bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         key === "posters" || key === "logos"
                           ? "aspect-[2/3]"
                           : "aspect-video",

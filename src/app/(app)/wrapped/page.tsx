@@ -31,7 +31,7 @@ export default async function WrappedPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-10 animate-fade-up">
-      <header className="relative overflow-hidden rounded-3xl border border-border bg-card/60 p-6 sm:p-10">
+      <header className="relative overflow-hidden rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05]/60 p-6 sm:p-10">
         <div
           className="pointer-events-none absolute inset-0 gradient-mesh dark:gradient-mesh-dark opacity-80"
           aria-hidden
@@ -82,7 +82,7 @@ export default async function WrappedPage({ searchParams }: PageProps) {
             {report.highestRated.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-xl border-0 bg-muted/40 px-3 py-2 text-sm dark:bg-white/[0.05]"
               >
                 <Link
                   href={
@@ -101,7 +101,7 @@ export default async function WrappedPage({ searchParams }: PageProps) {
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-border bg-card/50 p-4 sm:p-6">
+      <section className="rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4 sm:p-6">
         <ContributionHeatmap days={report.heatmap} year={year} />
       </section>
 
@@ -135,7 +135,7 @@ function FavoriteCard({
 }) {
   if (!entry) {
     return (
-      <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+      <div className="rounded-2xl border-0 p-6 text-sm text-muted-foreground">
         {label}: not enough data
       </div>
     );
@@ -149,7 +149,7 @@ function FavoriteCard({
   return (
     <Link
       href={href}
-      className="flex gap-4 rounded-2xl border border-border bg-card/60 p-4 transition-colors hover:bg-muted/30"
+      className="flex gap-4 rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4 transition-colors hover:bg-muted/30"
     >
       <span className="relative h-28 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
         {src ? (

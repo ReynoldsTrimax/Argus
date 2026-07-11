@@ -13,7 +13,7 @@ interface MediaGridProps {
 }
 
 /**
- * Responsive poster grid. Hover pop is portal-based (no clipping).
+ * Responsive poster grid — padded so hover lift is not clipped.
  */
 export function MediaGrid({
   items,
@@ -31,7 +31,7 @@ export function MediaGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-x-3 gap-y-10 pt-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       {items.map((item, index) => (
         <div
           key={`${item.mediaType}-${item.id}`}

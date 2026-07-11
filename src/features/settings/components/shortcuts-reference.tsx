@@ -14,7 +14,7 @@ export function ShortcutsReference() {
           outside text fields.
         </p>
       </div>
-      <ul className="divide-y divide-border rounded-xl border border-border">
+      <ul className="divide-y divide-border/40 rounded-xl border-0 bg-muted/30 dark:bg-white/[0.04]">
         {SHORTCUTS.map((s) => (
           <li
             key={s.id}

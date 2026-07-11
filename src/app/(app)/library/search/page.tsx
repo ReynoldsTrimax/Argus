@@ -73,7 +73,7 @@ export default async function LibrarySearchPage({ searchParams }: PageProps) {
               {results.notes.map((n) => (
                 <li
                   key={n.id}
-                  className="rounded-lg border border-border bg-card/40 px-3 py-2 text-sm"
+                  className="rounded-lg border-0 bg-muted/40 dark:bg-white/[0.05] px-3 py-2 text-sm"
                 >
                   {n.body}
                 </li>
@@ -87,7 +87,7 @@ export default async function LibrarySearchPage({ searchParams }: PageProps) {
               {results.reviews.map((r) => (
                 <li
                   key={r.id}
-                  className="rounded-lg border border-border bg-card/40 px-3 py-2 text-sm line-clamp-3"
+                  className="rounded-lg border-0 bg-muted/40 dark:bg-white/[0.05] px-3 py-2 text-sm line-clamp-3"
                 >
                   {r.body}
                 </li>

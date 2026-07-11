@@ -134,7 +134,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           control={form.control}
           name="isPublic"
           render={({ field }) => (
-            <FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
+            <FormItem className="flex items-center justify-between rounded-xl border-0 bg-muted/40 p-4 dark:bg-white/[0.05]">
               <div className="space-y-0.5 pr-4">
                 <FormLabel>Public profile</FormLabel>
                 <FormDescription>

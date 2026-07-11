@@ -100,7 +100,7 @@ export function RatingsDisplay({ ratings, className, compact }: RatingsDisplayPr
             rel="noreferrer"
             role="listitem"
             className={cn(
-              "rounded-xl border border-border bg-card px-3 py-2 shadow-xs transition-colors hover:border-primary/30",
+              "rounded-xl border-0 bg-muted/50 px-3 py-2 dark:bg-white/[0.06] transition-colors hover:bg-muted/70 dark:hover:bg-white/[0.1]",
               compact && "px-2.5 py-1.5",
             )}
           >
@@ -111,7 +111,7 @@ export function RatingsDisplay({ ratings, className, compact }: RatingsDisplayPr
             key={`${rating.provider}-${rating.label}`}
             role="listitem"
             className={cn(
-              "rounded-xl border border-border bg-card px-3 py-2 shadow-xs",
+              "rounded-xl border-0 bg-muted/50 px-3 py-2 dark:bg-white/[0.06]",
               compact && "px-2.5 py-1.5",
             )}
           >

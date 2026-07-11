@@ -18,8 +18,9 @@ interface MediaRowProps {
 }
 
 /**
- * Horizontal media rail. Pop-out hover lives in a document portal,
- * so overflow-x scroll never clips the animation.
+ * Horizontal media rail.
+ * Extra vertical padding keeps poster lift/scale fully visible (overflow-x
+ * otherwise clips the top of the pop).
  */
 export function MediaRow({
   title,
@@ -42,7 +43,7 @@ export function MediaRow({
   if (!items.length) return null;
 
   return (
-    <section className={cn("min-w-0 max-w-full space-y-4", className)} aria-label={title}>
+    <section className={cn("min-w-0 max-w-full space-y-3", className)} aria-label={title}>
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
           {href ? (
@@ -83,9 +84,13 @@ export function MediaRow({
         </div>
       </div>
 
+      {/*
+        overflow-x-auto forces vertical clipping in CSS; pad top/bottom so the
+        hover lift stays inside the scrollport and never gets cut off.
+      */}
       <div
         ref={scrollerRef}
-        className="scrollbar-thin flex max-w-full gap-4 overflow-x-auto scroll-smooth px-0.5 pb-4 pt-2 snap-x snap-mandatory"
+        className="scrollbar-thin -mx-1 flex max-w-[calc(100%+0.5rem)] gap-4 overflow-x-auto scroll-smooth px-1 pb-8 pt-8 snap-x snap-mandatory"
         tabIndex={0}
         role="list"
       >

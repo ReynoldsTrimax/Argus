@@ -36,6 +36,15 @@ export interface UserStats {
   totals: {
     moviesWatched: number;
     showsCompleted: number;
+    /** Actively watching / rewatching / paused series. */
+    showsWatching: number;
+    /** Dropped series count. */
+    showsDropped: number;
+    /**
+     * Series with real activity (completed + watching + paused + dropped +
+     * rewatching + any status with logged episode progress).
+     */
+    showsTracked: number;
     episodesWatched: number;
     totalWatchMinutes: number;
     averageRuntime: number | null;
@@ -154,7 +163,12 @@ export interface DashboardPayload {
   stats: UserStats;
   insights: Insight[];
   continueWatching: LibraryEntry[];
+  /** Completed titles only, newest first, capped. */
   recentlyWatched: LibraryEntry[];
+  /** Plan-to-watch queue. */
+  planToWatch: LibraryEntry[];
+  /** Dropped titles. */
+  dropped: LibraryEntry[];
   watchlist: LibraryEntry[];
   recentlyRated: LibraryEntry[];
   recentlyReviewed: { entry: LibraryEntry; reviewPreview: string }[];

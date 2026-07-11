@@ -16,13 +16,19 @@ export const metadata: Metadata = {
   description: "Explore trending movies, TV shows, and more on Argus",
 };
 
-export const revalidate = 3600;
+export const revalidate = 900;
 
 /**
  * Premium discovery homepage — Netflix / Apple TV style rails.
  */
 export default async function DiscoverPage() {
   const data = await safeGetDiscoveryHome();
+  const heroItems =
+    data.heroItems?.length > 0
+      ? data.heroItems
+      : data.hero
+        ? [data.hero]
+        : [];
 
   return (
     <div className="space-y-10">
@@ -35,7 +41,7 @@ export default async function DiscoverPage() {
 
       {"error" in data && data.error ? (
         <div
-          className="animate-fade-up rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          className="animate-fade-up rounded-xl border-0 bg-destructive/12 px-4 py-3 text-sm text-destructive"
           role="alert"
         >
           <p className="font-medium">Catalog temporarily unavailable</p>
@@ -43,9 +49,9 @@ export default async function DiscoverPage() {
         </div>
       ) : null}
 
-      {data.hero ? (
+      {heroItems.length > 0 ? (
         <ScrollReveal variant="scale">
-          <HeroBanner item={data.hero} />
+          <HeroBanner items={heroItems} intervalMs={3000} />
         </ScrollReveal>
       ) : null}
 

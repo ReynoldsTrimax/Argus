@@ -48,7 +48,7 @@ export default async function PersonPage({ params }: PageProps) {
   return (
     <div className="space-y-10 animate-fade-up">
       <section className="grid gap-8 lg:grid-cols-[16rem_1fr] lg:items-start">
-        <div className="relative mx-auto aspect-[2/3] w-48 overflow-hidden rounded-2xl border border-border bg-muted shadow-lg sm:w-56 lg:mx-0 lg:w-full">
+        <div className="relative mx-auto aspect-[2/3] w-48 overflow-hidden rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05] bg-muted shadow-lg sm:w-56 lg:mx-0 lg:w-full">
           {photo ? (
             <Image src={photo} alt="" fill priority sizes="256px" className="object-cover" />
           ) : (
@@ -90,7 +90,7 @@ export default async function PersonPage({ params }: PageProps) {
             </div>
           ) : null}
 
-          <div className="rounded-3xl border border-border bg-muted/40 border-dashed p-5 text-left">
+          <div className="rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] bg-muted/30 dark:bg-white/[0.04] p-5 text-left">
             <h2 className="text-sm font-semibold">Social links</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               External social profiles will appear here when connected.
@@ -140,7 +140,7 @@ function FilmographyList({
         {title}{" "}
         <span className="text-sm font-normal text-muted-foreground">({list.length})</span>
       </h2>
-      <ul className="divide-y divide-border rounded-2xl border border-border bg-muted/40">
+      <ul className="divide-y divide-border rounded-2xl border-0 bg-muted/40 dark:bg-white/[0.05]">
         {list.map((c) => {
           const poster = posterUrl(c.posterPath, "w92");
           return (

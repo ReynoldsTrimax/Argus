@@ -245,7 +245,8 @@ export interface LibraryListFilters {
     | "rating"
     | "added"
     | "release"
-    | "progress";
+    | "progress"
+    | "updated";
   page?: number;
   pageSize?: number;
 }

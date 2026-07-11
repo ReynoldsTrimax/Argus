@@ -81,6 +81,96 @@ describe("computeUserStats", () => {
     expect(stats.totals.averageRating).toBe(9);
     expect(stats.distributions.genres[0]?.name).toBe("Drama");
   });
+
+  it("counts completed and watching series toward episodes and hours", () => {
+    const data: IntelligenceRawData = {
+      ...empty,
+      entries: [
+        entry({
+          id: "s1",
+          title: "Done Show",
+          media_type: "tv",
+          status: "completed",
+          episodes_watched: 0,
+          total_episodes: 10,
+          runtime_minutes: 45,
+          user_rating: null,
+        }),
+        entry({
+          id: "s2",
+          title: "Watching Show",
+          media_type: "tv",
+          status: "watching",
+          episodes_watched: 4,
+          total_episodes: 12,
+          runtime_minutes: 40,
+          user_rating: null,
+        }),
+        entry({
+          id: "s3",
+          title: "Planned",
+          media_type: "tv",
+          status: "plan_to_watch",
+          episodes_watched: 0,
+          total_episodes: 8,
+          user_rating: null,
+        }),
+      ],
+    };
+    const stats = computeUserStats(data);
+    // 10 completed + 4 watching; planned ignored
+    expect(stats.totals.episodesWatched).toBe(14);
+    expect(stats.totals.showsCompleted).toBe(1);
+    expect(stats.totals.showsWatching).toBe(1);
+    expect(stats.totals.showsTracked).toBe(2);
+    // 10*45 + 4*40 = 610 minutes
+    expect(stats.totals.totalWatchMinutes).toBe(610);
+  });
+
+  it("counts dropped and paused series toward episodes, series, and hours", () => {
+    const data: IntelligenceRawData = {
+      ...empty,
+      entries: [
+        entry({
+          id: "d1",
+          title: "Dropped Midway",
+          media_type: "tv",
+          status: "dropped",
+          episodes_watched: 6,
+          total_episodes: 20,
+          runtime_minutes: 50,
+          user_rating: null,
+        }),
+        entry({
+          id: "p1",
+          title: "Paused Show",
+          media_type: "tv",
+          status: "paused",
+          episodes_watched: 3,
+          total_episodes: 10,
+          runtime_minutes: 40,
+          user_rating: null,
+        }),
+        entry({
+          id: "c1",
+          title: "Finished",
+          media_type: "tv",
+          status: "completed",
+          episodes_watched: 8,
+          total_episodes: 8,
+          runtime_minutes: 30,
+          user_rating: null,
+        }),
+      ],
+    };
+    const stats = computeUserStats(data);
+    // 6 + 3 + 8
+    expect(stats.totals.episodesWatched).toBe(17);
+    expect(stats.totals.showsDropped).toBe(1);
+    expect(stats.totals.showsTracked).toBe(3);
+    // 6*50 + 3*40 + 8*30 = 300 + 120 + 240 = 660
+    expect(stats.totals.totalWatchMinutes).toBe(660);
+  });
 });
 
 describe("formatWatchHours", () => {

@@ -3,10 +3,10 @@ import type { Insight } from "@/types/intelligence";
 import { Lightbulb, Sparkles, TrendingUp, Clock } from "lucide-react";
 
 const severityStyles: Record<Insight["severity"], string> = {
-  positive: "border-success/30 bg-success/5",
-  info: "border-primary/25 bg-primary/5",
-  neutral: "border-border bg-card/50",
-  warning: "border-warning/30 bg-warning/5",
+  positive: "border-0 bg-success/10",
+  info: "border-0 bg-primary/10",
+  neutral: "border-0 bg-muted/40 dark:bg-white/[0.05]",
+  warning: "border-0 bg-warning/10",
 };
 
 const categoryIcon = {
@@ -26,7 +26,7 @@ export function InsightCards({ insights }: { insights: Insight[] }) {
           <article
             key={insight.id}
             className={cn(
-              "rounded-2xl border p-4 shadow-xs",
+              "rounded-2xl p-4",
               severityStyles[insight.severity],
             )}
           >
