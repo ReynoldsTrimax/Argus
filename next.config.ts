@@ -8,7 +8,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    formats: ["image/avif", "image/webp"],
+    // Bypass Vercel Image Optimization — free/hobby plans can return
+    // OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED (402) and break all posters.
+    // TMDB already serves sized URLs (w342, w780, etc.).
+    loader: "custom",
+    loaderFile: "./src/lib/media/image-loader.ts",
     remotePatterns: [
       {
         protocol: "https",
