@@ -30,9 +30,31 @@ Command.displayName = CommandPrimitive.displayName;
 function CommandDialog({ children, ...props }: DialogProps) {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden border-0 bg-popover p-0 shadow-xl sm:max-w-xl sm:rounded-2xl data-[state=open]:zoom-in-[0.995] data-[state=closed]:zoom-out-[0.995]">
+      <DialogContent
+        className={cn(
+          "overflow-hidden border-0 p-0 sm:max-w-xl sm:rounded-2xl",
+          /* Frosted panel — matches translucent top bar */
+          "bg-background/70 shadow-xl backdrop-blur-xl supports-[backdrop-filter]:bg-background/55",
+          "dark:bg-black/55 dark:supports-[backdrop-filter]:bg-black/45",
+          "ring-1 ring-border/40 dark:ring-white/10",
+          /* Soft spotlight enter/exit */
+          "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
+          "data-[state=open]:zoom-in-[0.98] data-[state=closed]:zoom-out-[0.98]",
+          "data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-1",
+          "data-[state=open]:duration-300 data-[state=closed]:duration-200",
+          /* Hide default dialog close — Esc / overlay dismiss */
+          "[&>button.absolute]:hidden",
+        )}
+      >
         <DialogTitle className="sr-only">Command menu</DialogTitle>
-        <Command className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        {/*
+          shouldFilter=false: media results are ranked by our API / fuzzy layer.
+          cmdk's local filter would hide near-matches for typos (e.g. "inceptioon").
+        */}
+        <Command
+          shouldFilter={false}
+          className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
+        >
           {children}
         </Command>
       </DialogContent>
@@ -45,10 +67,10 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div
-    className="flex items-center border-b border-border/25 px-4"
+    className="flex items-center border-b border-border/20 bg-transparent px-4 dark:border-white/10"
     cmdk-input-wrapper=""
   >
-    <Search className="mr-3 h-5 w-5 shrink-0 text-primary/70" aria-hidden="true" />
+    <Search className="mr-3 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
@@ -124,7 +146,7 @@ const CommandItem = React.forwardRef<
       "relative flex cursor-default select-none items-center gap-2 rounded-xl px-3 py-2.5 text-sm outline-none",
       "transition-colors duration-200",
       "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
-      "data-[selected=true]:bg-primary/12 data-[selected=true]:text-foreground data-[selected=true]:shadow-xs",
+      "data-[selected=true]:bg-primary/20 data-[selected=true]:text-foreground data-[selected=true]:shadow-xs data-[selected=true]:backdrop-blur-md data-[selected=true]:ring-1 data-[selected=true]:ring-primary/20",
       "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       className,
     )}

@@ -33,7 +33,7 @@ export function AppShell({ user, children }: AppShellProps) {
             <AppHeader user={user} />
             <main
               id="main-content"
-              className="relative z-0 min-w-0 flex-1 isolate overflow-y-auto scroll-smooth bg-background"
+              className="relative z-0 min-w-0 flex-1 overflow-y-auto scroll-smooth bg-background"
             >
               <div className="content-container min-w-0 py-6 sm:py-8 lg:py-10">
                 <PageTransition>{children}</PageTransition>

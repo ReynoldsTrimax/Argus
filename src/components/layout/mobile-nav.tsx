@@ -67,30 +67,36 @@ export function MobileNav() {
                     setMobileNavOpen(false);
                   }}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                    "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? "nav-pill-active-bg text-[hsl(var(--nav-active-foreground))]"
+                      ? "nav-pill-active text-foreground"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                     item.comingSoon && "cursor-not-allowed opacity-60",
                   )}
                 >
+                  {active ? (
+                    <span
+                      className="nav-pill-active-bg absolute inset-0 rounded-xl"
+                      aria-hidden
+                    />
+                  ) : null}
                   <Icon
                     className={cn(
-                      "h-4 w-4",
-                      active && "text-[hsl(var(--nav-active-foreground))]",
+                      "relative z-[1] h-4 w-4",
+                      active && "text-foreground",
                     )}
                     aria-hidden="true"
                   />
                   <span
                     className={cn(
-                      "flex-1",
-                      active && "text-[hsl(var(--nav-active-foreground))]",
+                      "relative z-[1] flex-1",
+                      active && "text-foreground",
                     )}
                   >
                     {item.title}
                   </span>
                   {item.comingSoon ? (
-                    <Badge variant="muted" className="text-[10px]">
+                    <Badge variant="muted" className="relative z-[1] text-[10px]">
                       Soon
                     </Badge>
                   ) : null}

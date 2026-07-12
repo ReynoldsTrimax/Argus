@@ -31,7 +31,7 @@ export function MediaGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-10 pt-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-x-5 gap-y-16 px-3 pt-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:px-4">
       {items.map((item, index) => (
         <div
           key={`${item.mediaType}-${item.id}`}

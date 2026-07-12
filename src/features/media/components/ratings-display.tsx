@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { formatCount } from "@/lib/media/format";
 import type { MediaRating } from "@/types/media";
 
 interface RatingsDisplayProps {
@@ -80,7 +81,7 @@ export function RatingsDisplay({ ratings, className, compact }: RatingsDisplayPr
             </p>
             {rating.count != null && rating.count > 0 ? (
               <p className="text-[10px] text-muted-foreground">
-                {rating.count.toLocaleString()} votes
+                {formatCount(rating.count)} votes
               </p>
             ) : null}
             {rating.secondaryValue != null && rating.secondaryLabel ? (

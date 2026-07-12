@@ -44,7 +44,16 @@ export function formatVote(vote: number | null | undefined, scale = 10): string 
 
 export function formatNumber(n: number | null | undefined): string {
   if (n == null) return "—";
-  return new Intl.NumberFormat("en", { notation: "compact" }).format(n);
+  return new Intl.NumberFormat("en-US", { notation: "compact" }).format(n);
+}
+
+/**
+ * Full integer with fixed locale — avoids SSR/client hydration mismatches
+ * from default `toLocaleString()` (e.g. en-IN vs en-US grouping).
+ */
+export function formatCount(n: number | null | undefined): string {
+  if (n == null) return "—";
+  return new Intl.NumberFormat("en-US").format(n);
 }
 
 export function youtubeEmbedUrl(key: string): string {

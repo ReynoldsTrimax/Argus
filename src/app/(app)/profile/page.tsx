@@ -18,6 +18,7 @@ import { StatCounter } from "@/features/intelligence/components/stat-counter";
 import { getSessionContext } from "@/lib/services/user-service";
 import { ROUTES } from "@/constants/routes";
 import { formatDisplayName } from "@/lib/utils";
+import { formatDate } from "@/lib/media/format";
 import type { Profile } from "@/types";
 import { loadIntelligenceData } from "@/lib/intelligence/load-profile";
 import {
@@ -90,7 +91,7 @@ export default async function ProfilePage() {
               <p className="max-w-xl text-sm text-muted-foreground text-pretty">{data.bio}</p>
             ) : null}
             <p className="text-xs text-muted-foreground">
-              Member since {new Date(data.created_at).toLocaleDateString()}
+              Member since {formatDate(data.created_at) ?? "—"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

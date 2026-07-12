@@ -74,9 +74,7 @@ export function Sidebar() {
         <Icon
           className={cn(
             "relative z-[1] h-[1.1rem] w-[1.1rem] shrink-0",
-            active
-              ? "text-[hsl(var(--nav-active-foreground))]"
-              : "group-hover:text-foreground",
+            active ? "text-foreground" : "group-hover:text-foreground",
           )}
           aria-hidden="true"
         />
@@ -84,7 +82,7 @@ export function Sidebar() {
           <span
             className={cn(
               "relative z-[1] min-w-0 flex-1 truncate tracking-tight",
-              active && "text-[hsl(var(--nav-active-foreground))]",
+              active && "text-foreground",
             )}
           >
             {item.title}

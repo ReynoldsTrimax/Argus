@@ -85,19 +85,19 @@ export function MediaRow({
       </div>
 
       {/*
-        overflow-x-auto forces vertical clipping in CSS; pad top/bottom so the
-        hover lift stays inside the scrollport and never gets cut off.
+        overflow-x-auto clips the cross-axis and the first/last cards when they
+        scale on hover — generous padding keeps the pop fully visible.
       */}
       <div
         ref={scrollerRef}
-        className="scrollbar-thin -mx-1 flex max-w-[calc(100%+0.5rem)] gap-4 overflow-x-auto scroll-smooth px-1 pb-8 pt-8 snap-x snap-mandatory"
+        className="scrollbar-thin flex gap-5 overflow-x-auto scroll-smooth py-16 pl-8 pr-8 snap-x snap-mandatory scroll-pl-8 scroll-pr-8"
         tabIndex={0}
         role="list"
       >
         {items.map((item, index) => (
           <div
             key={`${item.mediaType}-${item.id}`}
-            className="snap-start"
+            className="snap-start shrink-0"
             role="listitem"
           >
             <PosterCard item={item} priority={index < priorityCount} />

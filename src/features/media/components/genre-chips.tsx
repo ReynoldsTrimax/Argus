@@ -14,6 +14,7 @@ interface GenreChipsProps {
 
 /**
  * Horizontally scrollable genre chips.
+ * Extra vertical padding keeps hover lift from clipping.
  */
 export function GenreChips({ genres, className }: GenreChipsProps) {
   if (!genres.length) return null;
@@ -29,7 +30,10 @@ export function GenreChips({ genres, className }: GenreChipsProps) {
           View all
         </Link>
       </div>
-      <div className="scrollbar-thin flex gap-2 overflow-x-auto pb-1">
+      {/*
+        overflow-x-auto clips the cross-axis; pad so hover translate stays visible.
+      */}
+      <div className="scrollbar-thin -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
         {genres.map((g) => (
           <Link
             key={g.id}
@@ -38,7 +42,7 @@ export function GenreChips({ genres, className }: GenreChipsProps) {
           >
             <Badge
               variant="muted"
-              className="h-9 cursor-pointer rounded-full border-0 bg-muted/70 px-4 text-sm font-medium text-foreground transition-colors hover:bg-primary/15 hover:text-foreground dark:bg-white/[0.07] dark:hover:bg-primary/20"
+              className="h-9 cursor-pointer rounded-full border-0 bg-muted/45 px-4 text-sm font-medium text-foreground backdrop-blur-md ring-1 ring-border/40 transition-colors hover:bg-muted/70 dark:bg-white/[0.08] dark:ring-white/10 dark:hover:bg-white/[0.14]"
             >
               {g.name}
             </Badge>

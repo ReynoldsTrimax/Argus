@@ -70,7 +70,9 @@ export function StatCounter({
         {label}
       </p>
       <p className="mt-1 font-display text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl">
-        {decimals > 0 ? display.toFixed(decimals) : Math.round(display).toLocaleString()}
+        {decimals > 0
+          ? display.toFixed(decimals)
+          : new Intl.NumberFormat("en-US").format(Math.round(display))}
         {suffix}
       </p>
       {hint ? (

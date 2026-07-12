@@ -764,18 +764,18 @@
     transform: translateY(0.5px);
   }
 
-  .glass-dialog {
-    background-color: hsl(var(--popover));
-    border: none;
+  .glass-command {
+    background-color: hsl(var(--background) / 0.72);
+    border: 1px solid hsl(var(--border) / 0.35);
     border-radius: var(--radius-2xl);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
     box-shadow: var(--shadow-xl);
   }
 
-  .glass-command {
-    background-color: hsl(var(--popover));
-    border: none;
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-xl);
+  :is(.dark) .glass-command {
+    background-color: hsl(0 0% 6% / 0.62);
+    border-color: hsl(0 0% 100% / 0.08);
   }
 
   .text-balance {
@@ -1013,14 +1013,35 @@
     }
   }
 
-  /* Selected nav: deeper brand blue + white label (same hue as --primary). */
+  /* Selected nav: neutral translucent wash (no solid blue fill). */
   .nav-pill-active {
-    color: hsl(var(--nav-active-foreground));
+    color: hsl(var(--foreground));
     box-shadow: none;
   }
 
   .nav-pill-active-bg {
-    background-color: hsl(var(--nav-active));
+    background-color: hsl(0 0% 0% / 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 0 1px hsl(0 0% 0% / 0.04);
+  }
+
+  :is(.dark) .nav-pill-active-bg {
+    background-color: hsl(0 0% 100% / 0.1);
+    box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 0.08);
+  }
+
+  .glass-dialog {
+    background-color: hsl(var(--background) / 0.72);
+    border: 1px solid hsl(var(--border) / 0.35);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: var(--shadow-xl);
+  }
+
+  :is(.dark) .glass-dialog {
+    background-color: hsl(0 0% 6% / 0.62);
+    border-color: hsl(0 0% 100% / 0.08);
   }
 
   /* High-refresh fluid motion tokens */

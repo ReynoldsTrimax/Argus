@@ -17,6 +17,7 @@ import type {
 } from "@/types/media";
 import type { MediaProvider } from "@/lib/media/providers/types";
 
+import { generateQueryVariants, titleSimilarityScore } from "@/lib/media/search-fuzzy";
 import { isTmdbConfigured, tmdbFetch } from "./client";
 import {
   mapCollection,
@@ -94,7 +95,7 @@ export class TmdbMediaProvider implements MediaProvider {
     }
 
     const page = options?.page ?? 1;
-    const [multi, collections, companies, genres] = await Promise.all([
+    const [multiPrimary, collections, companies, genres] = await Promise.all([
       tmdbFetch<TmdbPaginated<TmdbMultiResult>>("/search/multi", {
         query: q,
         page,
@@ -111,13 +112,40 @@ export class TmdbMediaProvider implements MediaProvider {
       this.getAllGenres(),
     ]);
 
-    return mapSearchResponse(
-      q,
-      multi ?? { page: 1, results: [], total_pages: 0, total_results: 0 },
-      collections,
-      companies,
-      genres,
-    );
+    let multi =
+      multiPrimary ?? ({ page: 1, results: [], total_pages: 0, total_results: 0 } as TmdbPaginated<TmdbMultiResult>);
+    let usedFuzzy = false;
+
+    // Typo / partial tolerance: if TMDB finds nothing, try relaxed query forms.
+    // Only on first page so pagination stays stable for exact matches.
+    if (page === 1 && (multi.results?.length ?? 0) === 0) {
+      const variants = generateQueryVariants(q);
+      for (const variant of variants) {
+        const alt = await tmdbFetch<TmdbPaginated<TmdbMultiResult>>("/search/multi", {
+          query: variant,
+          page: 1,
+          include_adult: false,
+        });
+        if (alt?.results?.length) {
+          multi = alt;
+          usedFuzzy = true;
+          break;
+        }
+      }
+    }
+
+    const mapped = mapSearchResponse(q, multi, collections, companies, genres);
+
+    if (usedFuzzy && mapped.results.length > 1) {
+      mapped.results = [...mapped.results].sort((a, b) => {
+        const score =
+          titleSimilarityScore(b.title, q) - titleSimilarityScore(a.title, q);
+        if (score !== 0) return score;
+        return (b.popularity ?? 0) - (a.popularity ?? 0);
+      });
+    }
+
+    return mapped;
   }
 
   async getMovie(id: string): Promise<MovieDetails | null> {

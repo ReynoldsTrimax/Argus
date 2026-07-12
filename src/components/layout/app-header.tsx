@@ -26,13 +26,10 @@ export function AppHeader({ user }: AppHeaderProps) {
         <Logo href={ROUTES.dashboard} showWordmark />
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="hidden md:block">
-          <CommandTrigger />
-        </div>
-      </div>
+      <div className="min-w-0 flex-1" aria-hidden />
 
       <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <CommandTrigger className="hidden md:inline-flex" />
         <CommandTrigger compact className="md:hidden" />
         <UserMenu user={user} />
       </div>
