@@ -71,7 +71,7 @@ export function VideoPlayer({ videos, className }: VideoPlayerProps) {
             className="group absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-muted to-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={`Play ${active.name}`}
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition-transform group-hover:scale-105">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-glow transition-transform group-hover:scale-105">
               <Play className="h-6 w-6 fill-current pl-0.5" />
             </span>
             <span className="max-w-xs px-4 text-center text-sm font-medium">

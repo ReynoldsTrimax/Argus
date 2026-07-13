@@ -65,7 +65,7 @@ export function MediaRow({
             type="button"
             variant="outline"
             size="icon-sm"
-            className="rounded-full"
+            className="rounded-xl"
             onClick={() => scroll(-1)}
             aria-label={`Scroll ${title} left`}
           >
@@ -75,7 +75,7 @@ export function MediaRow({
             type="button"
             variant="outline"
             size="icon-sm"
-            className="rounded-full"
+            className="rounded-xl"
             onClick={() => scroll(1)}
             aria-label={`Scroll ${title} right`}
           >

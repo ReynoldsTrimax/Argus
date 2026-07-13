@@ -27,23 +27,35 @@ const Command = React.forwardRef<
 ));
 Command.displayName = CommandPrimitive.displayName;
 
-function CommandDialog({ children, ...props }: DialogProps) {
+type CommandDialogProps = DialogProps & {
+  shouldFilter?: boolean;
+  className?: string;
+};
+
+function CommandDialog({
+  children,
+  className,
+  shouldFilter = false,
+  ...props
+}: CommandDialogProps) {
   return (
     <Dialog {...props}>
       <DialogContent
+        style={{
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
         className={cn(
           "overflow-hidden border-0 p-0 sm:max-w-xl sm:rounded-2xl",
           /* Frosted panel — matches translucent top bar */
           "bg-background/70 shadow-xl backdrop-blur-xl supports-[backdrop-filter]:bg-background/55",
           "dark:bg-black/55 dark:supports-[backdrop-filter]:bg-black/45",
           "ring-1 ring-border/40 dark:ring-white/10",
-          /* Soft spotlight enter/exit */
-          "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
-          "data-[state=open]:zoom-in-[0.98] data-[state=closed]:zoom-out-[0.98]",
-          "data-[state=open]:slide-in-from-top-2 data-[state=closed]:slide-out-to-top-1",
-          "data-[state=open]:duration-300 data-[state=closed]:duration-200",
           /* Hide default dialog close — Esc / overlay dismiss */
           "[&>button.absolute]:hidden",
+          className,
         )}
       >
         <DialogTitle className="sr-only">Command menu</DialogTitle>
@@ -52,7 +64,7 @@ function CommandDialog({ children, ...props }: DialogProps) {
           cmdk's local filter would hide near-matches for typos (e.g. "inceptioon").
         */}
         <Command
-          shouldFilter={false}
+          shouldFilter={shouldFilter}
           className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-14 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
         >
           {children}
@@ -146,7 +158,7 @@ const CommandItem = React.forwardRef<
       "relative flex cursor-default select-none items-center gap-2 rounded-xl px-3 py-2.5 text-sm outline-none",
       "transition-colors duration-200",
       "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
-      "data-[selected=true]:bg-primary/20 data-[selected=true]:text-foreground data-[selected=true]:shadow-xs data-[selected=true]:backdrop-blur-md data-[selected=true]:ring-1 data-[selected=true]:ring-primary/20",
+      "data-[selected=true]:bg-muted/70 data-[selected=true]:text-foreground data-[selected=true]:shadow-xs dark:data-[selected=true]:bg-white/[0.08]",
       "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       className,
     )}

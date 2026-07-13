@@ -431,6 +431,48 @@
   }
 }
 
+/*
+ * Radix dialog / command palette enter & exit.
+ * Opacity + CSS `scale` only — never touch `transform` so Tailwind
+ * -translate-x/y centering always keeps the panel in the middle.
+ */
+@keyframes dialog-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Opacity only — transform is reserved for centering (inline style) */
+@keyframes dialog-content-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-content-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Base
 --------------------------------------------------------------------------- */
@@ -817,6 +859,37 @@
     animation: pop-in 0.48s var(--ease-bounce) both;
   }
 
+  /*
+   * Dialog / command menu motion.
+   * Only run when data-state is set — never default to the exit animation
+   * (that left the panel uncentered / invisible when keyframes failed).
+   * Radix keeps the node mounted until animationend on data-state=closed.
+   */
+  .dialog-overlay-motion[data-state="open"] {
+    animation: dialog-overlay-in 220ms var(--ease-out) both;
+  }
+
+  .dialog-overlay-motion[data-state="closed"] {
+    animation: dialog-overlay-out 180ms var(--ease-out) both;
+  }
+
+  .dialog-content-motion[data-state="open"] {
+    animation: dialog-content-in 280ms var(--ease-lux) both;
+  }
+
+  .dialog-content-motion[data-state="closed"] {
+    animation: dialog-content-out 180ms var(--ease-out) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dialog-overlay-motion[data-state="open"],
+    .dialog-overlay-motion[data-state="closed"],
+    .dialog-content-motion[data-state="open"],
+    .dialog-content-motion[data-state="closed"] {
+      animation-duration: 1ms !important;
+    }
+  }
+
   .stagger-children > * {
     animation: fade-up var(--duration-reveal) var(--ease-lux) both;
   }
@@ -923,6 +996,15 @@
     right: -6%;
     background: hsl(250 55% 55% / 0.12);
     animation: float-y 12s var(--ease-in-out) infinite reverse;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .scrollbar-thin {

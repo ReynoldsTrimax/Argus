@@ -55,7 +55,7 @@ export default async function DiscoverPage() {
         </ScrollReveal>
       ) : null}
 
-      <Suspense fallback={<Skeleton className="h-12 w-full rounded-full" />}>
+      <Suspense fallback={<Skeleton className="h-12 w-full rounded-xl" />}>
         <ScrollReveal delay={0.05}>
           <GenreChips genres={data.genres} />
         </ScrollReveal>

@@ -77,7 +77,7 @@ export function StreamingProviders({
             return (
               <li
                 key={`${p.offerType}-${p.id}`}
-                className="inline-flex items-center gap-2 rounded-full border-0 bg-muted/50 dark:bg-white/[0.07]/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-xs"
+                className="inline-flex items-center gap-2 rounded-xl border-0 bg-muted/50 dark:bg-white/[0.07]/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-xs"
               >
                 {logo ? (
                   <span className="relative h-5 w-5 overflow-hidden rounded-md bg-white/10">

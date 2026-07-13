@@ -37,7 +37,7 @@ export function SeriesStatsTabs({
 
   const tabs = (
     <div
-      className="inline-flex w-fit rounded-full border-0 bg-muted/60 p-0.5 dark:bg-white/[0.08]"
+      className="inline-flex w-fit rounded-xl border-0 bg-muted/60 p-0.5 dark:bg-white/[0.08]"
       role="tablist"
       aria-label="Episodes or series"
     >
@@ -47,7 +47,7 @@ export function SeriesStatsTabs({
         aria-selected={tab === "episodes"}
         onClick={() => setTab("episodes")}
         className={cn(
-          "rounded-full px-2.5 py-0.5 text-[10px] font-medium transition-colors sm:px-3 sm:text-[11px]",
+          "rounded-lg px-2.5 py-0.5 text-[10px] font-medium transition-colors sm:px-3 sm:text-[11px]",
           tab === "episodes"
             ? "bg-primary text-primary-foreground shadow-xs"
             : "text-muted-foreground hover:text-foreground",
@@ -61,7 +61,7 @@ export function SeriesStatsTabs({
         aria-selected={tab === "series"}
         onClick={() => setTab("series")}
         className={cn(
-          "rounded-full px-2.5 py-0.5 text-[10px] font-medium transition-colors sm:px-3 sm:text-[11px]",
+          "rounded-lg px-2.5 py-0.5 text-[10px] font-medium transition-colors sm:px-3 sm:text-[11px]",
           tab === "series"
             ? "bg-primary text-primary-foreground shadow-xs"
             : "text-muted-foreground hover:text-foreground",

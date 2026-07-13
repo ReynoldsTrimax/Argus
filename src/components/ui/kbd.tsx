@@ -17,3 +17,16 @@ export function Kbd({
     />
   );
 }
+
+/** Groups adjacent kbd chips (e.g. ⌘ K). */
+export function KbdGroup({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      className={cn("inline-flex items-center gap-0.5", className)}
+      {...props}
+    />
+  );
+}

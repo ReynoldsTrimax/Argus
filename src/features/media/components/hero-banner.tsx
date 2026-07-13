@@ -171,7 +171,7 @@ export function HeroBanner({
             <button
               type="button"
               onClick={() => go(-1)}
-              className="rounded-full border-0 bg-muted/50 dark:bg-white/[0.08] p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl border-0 bg-muted/50 dark:bg-white/[0.08] p-1.5 text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Previous featured title"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -186,8 +186,8 @@ export function HeroBanner({
                   aria-current={i === index}
                   className={
                     i === index
-                      ? "h-1.5 w-5 rounded-full bg-primary transition-all"
-                      : "h-1.5 w-1.5 rounded-full bg-muted-foreground/40 transition-all hover:bg-muted-foreground/70"
+                      ? "h-1.5 w-5 rounded-md bg-primary transition-all"
+                      : "h-1.5 w-1.5 rounded-md bg-muted-foreground/40 transition-all hover:bg-muted-foreground/70"
                   }
                 />
               ))}
@@ -195,7 +195,7 @@ export function HeroBanner({
             <button
               type="button"
               onClick={() => go(1)}
-              className="rounded-full border-0 bg-muted/50 dark:bg-white/[0.08] p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl border-0 bg-muted/50 dark:bg-white/[0.08] p-1.5 text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Next featured title"
             >
               <ChevronRight className="h-4 w-4" />

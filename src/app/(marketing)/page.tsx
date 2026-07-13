@@ -22,7 +22,7 @@ export default function LandingPage() {
     <div className="relative overflow-hidden bg-background">
       <section className="content-container relative z-[1] flex flex-col items-center px-4 pb-20 pt-16 text-center sm:pt-24 lg:pt-28">
         <motion.div
-          className="mb-6 inline-flex items-center gap-2 rounded-full border-0 bg-muted/50 dark:bg-white/[0.07] px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs"
+          className="mb-6 inline-flex items-center gap-2 rounded-xl border-0 bg-muted/50 dark:bg-white/[0.07] px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs"
           initial={reduce ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}

@@ -11,8 +11,8 @@ interface AppShellProps {
 }
 
 /**
- * Icon rail + content side by side. Expanding the menu grows the rail and
- * pushes the main column over — nothing stacks on top of posters.
+ * Resizable sidebar + content side by side. The rail is layout width —
+ * nothing stacks on top of posters.
  */
 export function AppShell({ user, children }: AppShellProps) {
   return (

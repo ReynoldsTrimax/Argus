@@ -42,7 +42,7 @@ export function GenreChips({ genres, className }: GenreChipsProps) {
           >
             <Badge
               variant="muted"
-              className="h-9 cursor-pointer rounded-full border-0 bg-muted/45 px-4 text-sm font-medium text-foreground backdrop-blur-md ring-1 ring-border/40 transition-colors hover:bg-muted/70 dark:bg-white/[0.08] dark:ring-white/10 dark:hover:bg-white/[0.14]"
+              className="h-9 cursor-pointer rounded-xl border-0 bg-muted/45 px-4 text-sm font-medium text-foreground backdrop-blur-md ring-1 ring-border/40 transition-colors hover:bg-muted/70 dark:bg-white/[0.08] dark:ring-white/10 dark:hover:bg-white/[0.14]"
             >
               {g.name}
             </Badge>

@@ -17,7 +17,7 @@ export const APP_METADATA = {
 /** Layout measurements (mirrored in CSS variables). */
 export const LAYOUT = {
   headerHeight: 56,
-  sidebarWidth: 240,
+  sidebarWidth: 260,
   sidebarCollapsedWidth: 64,
   contentMaxWidth: 1440,
 } as const;

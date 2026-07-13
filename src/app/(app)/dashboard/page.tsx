@@ -336,7 +336,7 @@ export default async function DashboardPage() {
               <Badge
                 key={g.name}
                 variant="muted"
-                className="h-8 rounded-full border-0 bg-muted/70 px-3 text-foreground dark:bg-white/[0.07]"
+                className="h-8 rounded-xl border-0 bg-muted/70 px-3 text-foreground dark:bg-white/[0.07]"
               >
                 {g.name}
                 <span className="ml-1.5 text-muted-foreground">{g.count}</span>
