@@ -141,7 +141,15 @@ export default async function TvDetailPage({ params }: PageProps) {
 
       <div className="grid w-full min-w-0 max-w-full gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16.5rem,20rem)] lg:items-start lg:gap-6">
         <div className="min-w-0 max-w-full space-y-10 overflow-x-hidden">
-          <SeasonEpisodes showId={show.id} seasons={show.seasons} />
+          {/* Progress is recorded here, on the episode rows themselves. Tracking
+              props are omitted for signed-out visitors, who get the same list
+              without checkboxes. */}
+          <SeasonEpisodes
+            showId={show.id}
+            seasons={show.seasons}
+            identity={personal.userId ? identity : undefined}
+            episodeProgress={personal.episodeProgress}
+          />
 
           <CastRow people={show.cast} />
 
@@ -160,11 +168,6 @@ export default async function TvDetailPage({ params }: PageProps) {
               initial={personal}
               allTags={allTags}
               allCollections={allCollections}
-              seasons={show.seasons.map((s) => ({
-                seasonNumber: s.seasonNumber,
-                name: s.name,
-                episodeCount: s.episodeCount ?? null,
-              }))}
             />
           ) : null}
 

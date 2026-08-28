@@ -10,6 +10,7 @@ import {
   Pause,
   Play,
   Star,
+  Trash2,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,7 +43,7 @@ import {
   actionCreateCollection,
   actionLogSession,
   actionSetMovieProgress,
-  actionSetTvProgress,
+  actionRemoveFromLibrary,
 } from "@/features/library/actions/library-actions";
 import {
   WATCH_STATUS_LABELS,
@@ -55,20 +56,12 @@ import {
 } from "@/types/library";
 import { cn } from "@/lib/utils";
 
-export interface TvSeasonOption {
-  seasonNumber: number;
-  name: string;
-  episodeCount: number | null;
-}
-
 interface PersonalMediaPanelProps {
   identity: MediaIdentity;
   initial: PersonalMediaState;
   allTags: Tag[];
   allCollections: Collection[];
   ratingScale?: "five" | "ten" | "hundred";
-  /** Season list for TV progress picker (episode counts). */
-  seasons?: TvSeasonOption[];
 }
 
 /**
@@ -81,7 +74,6 @@ export function PersonalMediaPanel({
   allTags,
   allCollections,
   ratingScale = "ten",
-  seasons = [],
 }: PersonalMediaPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = React.useTransition();
@@ -100,12 +92,6 @@ export function PersonalMediaPanel({
   const [movieMinutes, setMovieMinutes] = React.useState(
     initial.entry?.movie_progress_minutes?.toString() ?? "",
   );
-  const [tvSeason, setTvSeason] = React.useState(
-    String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1),
-  );
-  const [tvEpisode, setTvEpisode] = React.useState(
-    String(initial.entry?.current_episode ?? 1),
-  );
 
   // Reset editable fields when the server payload identity changes (after router.refresh).
   const [prevKey, setPrevKey] = React.useState(formKey);
@@ -115,17 +101,7 @@ export function PersonalMediaPanel({
     setSpoilers(initial.review?.contains_spoilers ?? false);
     setRating(initial.entry?.user_rating?.toString() ?? "");
     setMovieMinutes(initial.entry?.movie_progress_minutes?.toString() ?? "");
-    setTvSeason(String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1));
-    setTvEpisode(String(initial.entry?.current_episode ?? 1));
   }
-
-  const seasonOptions =
-    seasons.length > 0
-      ? seasons
-      : [{ seasonNumber: 1, name: "Season 1", episodeCount: null }];
-  const selectedSeasonMeta =
-    seasonOptions.find((s) => String(s.seasonNumber) === tvSeason) ?? seasonOptions[0]!;
-  const maxEpisode = Math.max(1, selectedSeasonMeta.episodeCount ?? 50);
 
   const state = initial;
 
@@ -149,6 +125,62 @@ export function PersonalMediaPanel({
       }
       toast.success(`Marked as ${WATCH_STATUS_LABELS[status]}`);
     });
+  };
+
+  /**
+   * Anything the cascade would destroy beyond a bare status.
+   *
+   * Untracking a title the user only tapped once is trivially reversible — one
+   * tap puts it back — so it removes immediately. Once a rating, review, note or
+   * episode progress exists, the delete is no longer reversible and has to be
+   * confirmed first.
+   */
+  const hasDataWorthKeeping = Boolean(
+    state.entry &&
+      (state.entry.user_rating != null ||
+        state.review ||
+        state.notes.length > 0 ||
+        (state.entry.episodes_watched ?? 0) > 0 ||
+        (state.entry.movie_progress_minutes ?? 0) > 0),
+  );
+
+  const [confirmingRemove, setConfirmingRemove] = React.useState(false);
+
+  const removeFromLibrary = () => {
+    setConfirmingRemove(false);
+    run(async () => {
+      const res = await actionRemoveFromLibrary(identity);
+      if (!res.success) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(
+        res.data.removed
+          ? `Removed ${res.data.title ?? identity.title} from your library`
+          : "Not in your library",
+      );
+    });
+  };
+
+  const requestRemove = () => {
+    if (hasDataWorthKeeping) {
+      setConfirmingRemove(true);
+      return;
+    }
+    removeFromLibrary();
+  };
+
+  /**
+   * Status buttons are toggles: pressing the active status untracks the title.
+   * Pressing a different one just moves it, as before.
+   */
+  const toggleStatus = (status: WatchStatus) => {
+    if (state.entry?.status === status) {
+      requestRemove();
+      return;
+    }
+    setConfirmingRemove(false);
+    setStatus(status);
   };
 
   const maxRating = ratingScale === "five" ? 5 : ratingScale === "hundred" ? 100 : 10;
@@ -179,65 +211,48 @@ export function PersonalMediaPanel({
         ) : null}
       </div>
 
-      {/* Quick status — primary actions, compact for sidebar */}
-      <div className="grid grid-cols-2 gap-1.5">
-        <Button
-          type="button"
-          size="sm"
-          variant={state.entry?.status === "watching" ? "default" : "outline"}
-          className={cn(
-            "h-8 text-xs",
-            state.entry?.status === "watching" && "shadow-glow",
-          )}
-          onClick={() => setStatus("watching")}
+      {/* Quick status — each button is a toggle: pressing the active one untracks. */}
+      <div className="grid grid-cols-2 gap-2">
+        <StatusToggle
+          label="Watching"
+          icon={<Play className="h-3.5 w-3.5" />}
+          active={state.entry?.status === "watching"}
+          glow
+          onClick={() => toggleStatus("watching")}
           disabled={pending}
-        >
-          <Play className="h-3.5 w-3.5" />
-          Watching
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={state.entry?.status === "completed" ? "default" : "outline"}
-          className={cn(
-            "h-8 text-xs",
-            state.entry?.status === "completed" && "shadow-glow",
-          )}
-          onClick={() => setStatus("completed")}
+        />
+        <StatusToggle
+          label="Completed"
+          icon={<Check className="h-3.5 w-3.5" />}
+          active={state.entry?.status === "completed"}
+          glow
+          onClick={() => toggleStatus("completed")}
           disabled={pending}
-        >
-          <Check className="h-3.5 w-3.5" />
-          Completed
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={
-            state.entry?.status === "plan_to_watch" || state.entry?.status === "wishlist"
-              ? "default"
-              : "outline"
+        />
+        <StatusToggle
+          label="Plan"
+          icon={<Bookmark className="h-3.5 w-3.5" />}
+          active={
+            state.entry?.status === "plan_to_watch" ||
+            state.entry?.status === "wishlist"
           }
-          className="h-8 text-xs"
-          onClick={() => setStatus("plan_to_watch")}
+          onClick={() =>
+            toggleStatus(
+              state.entry?.status === "wishlist" ? "wishlist" : "plan_to_watch",
+            )
+          }
           disabled={pending}
-        >
-          <Bookmark className="h-3.5 w-3.5" />
-          Plan
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={state.entry?.status === "dropped" ? "default" : "outline"}
-          className="h-8 text-xs"
-          onClick={() => setStatus("dropped")}
+        />
+        <StatusToggle
+          label="Dropped"
+          icon={<XCircle className="h-3.5 w-3.5" />}
+          active={state.entry?.status === "dropped"}
+          onClick={() => toggleStatus("dropped")}
           disabled={pending}
-        >
-          <XCircle className="h-3.5 w-3.5" />
-          Dropped
-        </Button>
+        />
       </div>
 
-      <div className="flex gap-1.5">
+      <div className="flex gap-2">
         <Button
           type="button"
           variant={state.entry?.is_favorite ? "default" : "outline"}
@@ -292,6 +307,59 @@ export function PersonalMediaPanel({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Untrack — covers every status, including ones only reachable from the
+          dropdown above, where re-picking the current value fires no change. */}
+      {state.entry ? (
+        confirmingRemove ? (
+          <div
+            className="panel-block-enter space-y-2 rounded-xl bg-destructive/10 p-3"
+            role="alertdialog"
+            aria-label="Confirm removal"
+          >
+            <p className="text-foreground text-[11px] leading-relaxed">
+              Remove <span className="font-medium">{identity.title}</span> and
+              everything saved with it — your rating, review, notes and episode
+              progress? This can&apos;t be undone.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                className="h-8 flex-1 text-xs"
+                disabled={pending}
+                onClick={removeFromLibrary}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Remove
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 flex-1 text-xs"
+                disabled={pending}
+                onClick={() => setConfirmingRemove(false)}
+              >
+                Keep
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="text-muted-foreground hover:text-destructive h-8 w-full text-xs"
+            disabled={pending}
+            onClick={requestRemove}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Remove from library
+          </Button>
+        )
+      ) : null}
 
       {state.entry && state.entry.progress_percent > 0 ? (
         <div className="panel-block-enter bg-muted/40 space-y-1.5 rounded-xl px-3 py-2.5">
@@ -357,112 +425,9 @@ export function PersonalMediaPanel({
         </div>
       ) : null}
 
-      {/* Progress picker: watching / paused / dropped (not completed — full run is assumed). */}
-      {identity.mediaType === "tv" && currentStatus !== "completed" ? (
-        <div className="panel-block-enter bg-muted/30 space-y-2 rounded-xl border-0 p-3 dark:bg-white/[0.04]">
-          <div>
-            <p className="text-foreground text-xs font-medium">Watched up to</p>
-            <p className="text-muted-foreground mt-0.5 text-[11px] leading-relaxed">
-              {currentStatus === "dropped"
-                ? "Log how far you got before dropping — still counts toward hours."
-                : "Set season & episode — hours go to your total watched."}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <Label htmlFor="tv-season" className="text-muted-foreground text-[11px]">
-                Season
-              </Label>
-              <Select
-                value={tvSeason}
-                onValueChange={(v) => {
-                  setTvSeason(v);
-                  setTvEpisode("1");
-                }}
-                disabled={pending}
-              >
-                <SelectTrigger id="tv-season" className="h-8 text-xs">
-                  <SelectValue placeholder="Season" />
-                </SelectTrigger>
-                <SelectContent>
-                  {seasonOptions.map((s) => (
-                    <SelectItem key={s.seasonNumber} value={String(s.seasonNumber)}>
-                      {s.name}
-                      {s.episodeCount != null ? ` (${s.episodeCount})` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="tv-episode" className="text-muted-foreground text-[11px]">
-                Episode
-              </Label>
-              <Input
-                id="tv-episode"
-                type="number"
-                min={1}
-                max={maxEpisode}
-                value={tvEpisode}
-                onChange={(e) => setTvEpisode(e.target.value)}
-                className="h-8 text-xs"
-                disabled={pending}
-              />
-            </div>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            className="h-8 w-full text-xs"
-            disabled={pending}
-            onClick={() =>
-              run(async () => {
-                const s = Number(tvSeason);
-                const e = Number(tvEpisode);
-                if (!Number.isFinite(s) || s < 1 || !Number.isFinite(e) || e < 1) {
-                  toast.error("Enter a valid season and episode");
-                  return;
-                }
-                if (e > maxEpisode) {
-                  toast.error(`Episode must be 1–${maxEpisode} for this season`);
-                  return;
-                }
-                const res = await actionSetTvProgress(
-                  identity,
-                  s,
-                  e,
-                  seasonOptions.map((x) => ({
-                    seasonNumber: x.seasonNumber,
-                    episodeCount: x.episodeCount,
-                  })),
-                );
-                if (!res.success) {
-                  toast.error(res.error);
-                  return;
-                }
-                const hours = Math.round((res.data.minutesAdded / 60) * 10) / 10;
-                toast.success(
-                  res.data.minutesAdded > 0
-                    ? `Saved S${s}E${e} · +${hours}h added to totals`
-                    : `Progress set to S${s}E${e}`,
-                );
-              })
-            }
-          >
-            <Play className="h-3.5 w-3.5" />
-            Save episode progress
-          </Button>
-          {state.entry?.current_season != null ? (
-            <p className="text-muted-foreground text-[11px]">
-              Current: S{state.entry.current_season}E{state.entry.current_episode ?? "—"}{" "}
-              · {state.entry.episodes_watched} ep
-              {identity.runtimeMinutes
-                ? ` · ~${Math.round(((state.entry.episodes_watched || 0) * identity.runtimeMinutes) / 60)}h`
-                : ""}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
+      {/* The season/episode checklist above replaces the old two-dropdown
+          "Watched up to" form. Keeping both would mean two write paths to the
+          same rows, which is how progress ends up disagreeing with itself. */}
 
       <Separator className="opacity-60" />
 
@@ -774,5 +739,52 @@ export function PersonalMediaPanel({
         Log watch session
       </Button>
     </aside>
+  );
+}
+
+interface StatusToggleProps {
+  label: string;
+  icon: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+  glow?: boolean;
+}
+
+/**
+ * A status button that reads as a toggle.
+ *
+ * `aria-pressed`, plus a label that changes once active, is what tells the user
+ * the second press untracks the title — without it the control looks like it
+ * would simply re-apply a status it already has. The press scale fires on
+ * pointer-down rather than on completion, so the feedback never waits for the
+ * server round trip.
+ */
+function StatusToggle({
+  label,
+  icon,
+  active,
+  onClick,
+  disabled,
+  glow = false,
+}: StatusToggleProps) {
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant={active ? "default" : "outline"}
+      aria-pressed={active}
+      aria-label={active ? `${label} — press again to remove from library` : label}
+      title={active ? "Press again to remove from library" : undefined}
+      className={cn(
+        "h-8 justify-center gap-1.5 text-xs transition-transform duration-100 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
+        active && glow && "shadow-glow",
+      )}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {icon}
+      {label}
+    </Button>
   );
 }

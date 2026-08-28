@@ -41,7 +41,10 @@ export function Logo({
         <span
           className={cn(
             bostone.className,
-            "relative text-[1.0625rem] leading-none text-foreground",
+            // Larger and set tighter: as a wordmark grows, the single spaces
+            // between letters read as gaps, so negative tracking pulls it back
+            // into one mark instead of five letters.
+            "relative text-[1.5rem] leading-none tracking-[-0.015em] text-foreground",
           )}
         >
           {SPACED_NAME}

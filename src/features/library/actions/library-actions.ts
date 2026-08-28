@@ -10,6 +10,8 @@ import {
   setPinned,
   setHidden,
   setMovieProgress,
+  getLibraryEntryByExternal,
+  deleteLibraryEntry,
 } from "@/lib/library/entries";
 import { setRating, upsertReview, createNote, updateNote, deleteNote } from "@/lib/library/ratings-reviews-notes";
 import {
@@ -26,6 +28,7 @@ import {
 import {
   markEpisodeWatched,
   unmarkEpisode,
+  setSeasonWatched,
   logWatchSession,
   setTvProgressPosition,
 } from "@/lib/library/progress-sessions";
@@ -387,6 +390,181 @@ export async function actionUnmarkEpisode(
     await unmarkEpisode(user.id, entryId, seasonNumber, episodeNumber);
     revalidateLibrary();
     return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+/**
+ * Toggles a single episode from the sidebar checklist.
+ *
+ * Unlike `actionUnmarkEpisode`, this takes an identity rather than an entry id
+ * so the very first tap on an untracked show can create the library entry and
+ * mark the episode in one call — the checklist has no entry to reference yet.
+ */
+export async function actionToggleEpisode(
+  identityInput: MediaIdentity,
+  seasonNumber: number,
+  episodeNumber: number,
+  watched: boolean,
+): Promise<ActionResult<{ episodesWatched: number; progressPercent: number }>> {
+  try {
+    const user = await requireUser();
+    const identity = mediaIdentitySchema.parse(identityInput);
+    if (identity.mediaType !== "tv") {
+      return { success: false, error: "Only TV shows have episodes" };
+    }
+    const entry = await ensureLibraryEntry(user.id, identity, {
+      status: watched ? "watching" : undefined,
+    });
+
+    if (watched) {
+      await markEpisodeWatched(user.id, entry.id, seasonNumber, episodeNumber, {
+        runtimeMinutes: identity.runtimeMinutes ?? undefined,
+        totalEpisodes: identity.totalEpisodes ?? undefined,
+      });
+    } else {
+      await unmarkEpisode(user.id, entry.id, seasonNumber, episodeNumber);
+    }
+
+    const refreshed = await getLibraryEntryByExternal(
+      user.id,
+      "tv",
+      identity.externalId,
+    );
+    revalidateLibrary([ROUTES.show(identity.externalId), ROUTES.stats]);
+    return {
+      success: true,
+      data: {
+        episodesWatched: refreshed?.episodes_watched ?? 0,
+        progressPercent: refreshed?.progress_percent ?? 0,
+      },
+    };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+/** Marks or clears every episode in one season. */
+export async function actionSetSeasonWatched(
+  identityInput: MediaIdentity,
+  seasonNumber: number,
+  episodeNumbers: number[],
+  watched: boolean,
+): Promise<
+  ActionResult<{ episodesWatched: number; progressPercent: number; changed: number }>
+> {
+  try {
+    const user = await requireUser();
+    const identity = mediaIdentitySchema.parse(identityInput);
+    if (identity.mediaType !== "tv") {
+      return { success: false, error: "Only TV shows have episodes" };
+    }
+    const entry = await ensureLibraryEntry(user.id, identity, {
+      status: watched ? "watching" : undefined,
+    });
+
+    const result = await setSeasonWatched(
+      user.id,
+      entry.id,
+      seasonNumber,
+      episodeNumbers,
+      watched,
+      {
+        runtimeMinutes: identity.runtimeMinutes,
+        totalEpisodes: identity.totalEpisodes,
+      },
+    );
+
+    revalidateLibrary([ROUTES.show(identity.externalId), ROUTES.stats]);
+    return { success: true, data: result };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+/**
+ * Marks or clears the entire series.
+ *
+ * Seasons are applied sequentially rather than in parallel because each batch
+ * ends with a rollup that reads the same entry row; overlapping them would let
+ * two recalculations race and persist a stale episode count.
+ */
+export async function actionSetAllEpisodesWatched(
+  identityInput: MediaIdentity,
+  seasons: { seasonNumber: number; episodeCount: number | null }[],
+  watched: boolean,
+): Promise<ActionResult<{ episodesWatched: number; progressPercent: number }>> {
+  try {
+    const user = await requireUser();
+    const identity = mediaIdentitySchema.parse(identityInput);
+    if (identity.mediaType !== "tv") {
+      return { success: false, error: "Only TV shows have episodes" };
+    }
+    const entry = await ensureLibraryEntry(user.id, identity, {
+      status: watched ? "watching" : undefined,
+    });
+
+    let last = { episodesWatched: 0, progressPercent: 0 };
+    for (const season of seasons) {
+      const count = season.episodeCount ?? 0;
+      if (count <= 0) continue;
+      const result = await setSeasonWatched(
+        user.id,
+        entry.id,
+        season.seasonNumber,
+        Array.from({ length: count }, (_, i) => i + 1),
+        watched,
+        {
+          runtimeMinutes: identity.runtimeMinutes,
+          totalEpisodes: identity.totalEpisodes,
+        },
+      );
+      last = {
+        episodesWatched: result.episodesWatched,
+        progressPercent: result.progressPercent,
+      };
+    }
+
+    revalidateLibrary([ROUTES.show(identity.externalId), ROUTES.stats]);
+    return { success: true, data: last };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+/**
+ * Removes a title from the library, making every status button a toggle.
+ *
+ * Returns `removed: false` rather than an error when there is nothing tracked,
+ * so a double-click that races itself reads as "already gone" instead of
+ * surfacing a failure the user cannot act on.
+ */
+export async function actionRemoveFromLibrary(
+  identityInput: MediaIdentity,
+): Promise<ActionResult<{ removed: boolean; title: string | null }>> {
+  try {
+    const user = await requireUser();
+    const identity = mediaIdentitySchema.parse(identityInput);
+    const entry = await getLibraryEntryByExternal(
+      user.id,
+      identity.mediaType,
+      identity.externalId,
+    );
+
+    if (!entry) {
+      return { success: true, data: { removed: false, title: null } };
+    }
+
+    const { title } = await deleteLibraryEntry(user.id, entry.id);
+    revalidateLibrary([
+      identity.mediaType === "tv"
+        ? ROUTES.show(identity.externalId)
+        : ROUTES.movie(identity.externalId),
+      ROUTES.stats,
+      ROUTES.insights,
+    ]);
+    return { success: true, data: { removed: true, title } };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : "Failed" };
   }
