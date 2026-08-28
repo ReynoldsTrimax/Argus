@@ -43,20 +43,32 @@ export function LoginForm() {
       formData.set("password", values.password);
       formData.set("next", next);
 
-      const result = await signInWithPassword(null, formData);
-      if (result && !result.success) {
-        toast.error(result.error);
+      // A rejected action would otherwise become an unhandled rejection and let
+      // the root error boundary replace this form, hiding the reason. A
+      // successful sign-in redirects server-side, which resolves here rather
+      // than rejecting, so this catch only sees genuine failures.
+      try {
+        const result = await signInWithPassword(null, formData);
+        if (result && !result.success) {
+          toast.error(result.error);
+        }
+      } catch {
+        toast.error("Couldn't sign in. Please try again.");
       }
     });
   }
 
   async function handleOAuth(provider: "google") {
-    const result = await signInWithOAuth(provider);
-    if (!result.success) {
-      toast.error(result.error);
-      return;
+    try {
+      const result = await signInWithOAuth(provider);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      window.location.href = result.data.url;
+    } catch {
+      toast.error("Couldn't start Google sign-in. Please try again.");
     }
-    window.location.href = result.data.url;
   }
 
   return (

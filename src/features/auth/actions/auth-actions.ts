@@ -22,6 +22,34 @@ function getOriginFromHeaders(headerStore: Headers): string {
 const AUTH_UNREACHABLE =
   "Can't reach the authentication service. It may be paused or restarting — check your Supabase project status, then try again.";
 
+/** Message shown when Supabase credentials are absent or malformed. */
+const AUTH_UNCONFIGURED =
+  "Authentication isn't configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local, then restart the dev server.";
+
+/**
+ * Builds a Supabase client, converting a configuration failure into a value.
+ *
+ * `getServerEnv()` throws when the Supabase keys are missing. Inside a Server
+ * Action that throw becomes a 500, and the root error boundary replaces the
+ * whole sign-in card — so the single piece of information the person needs
+ * (which variable is unset) is the one thing they cannot see, and the failure
+ * looks identical to a wrong password. Returning it instead keeps them on the
+ * form with an actionable message.
+ */
+async function createAuthClient(): Promise<
+  { ok: true; client: Awaited<ReturnType<typeof createClient>> } | { ok: false; error: string }
+> {
+  try {
+    return { ok: true, client: await createClient() };
+  } catch (error) {
+    console.error(
+      "[auth] Supabase client could not be created — check .env.local:",
+      error instanceof Error ? error.message : error,
+    );
+    return { ok: false, error: AUTH_UNCONFIGURED };
+  }
+}
+
 /**
  * Runs a Supabase auth call and normalises transport failures.
  *
@@ -73,9 +101,13 @@ export async function signInWithPassword(
     };
   }
 
-  const supabase = await createClient();
+  const client = await createAuthClient();
+  if (!client.ok) {
+    return { success: false, error: client.error };
+  }
+
   const attempt = await withAuthTransport(() =>
-    supabase.auth.signInWithPassword({
+    client.client.auth.signInWithPassword({
       email: parsed.data.email,
       password: parsed.data.password,
     }),
@@ -120,10 +152,14 @@ export async function signUpWithPassword(
 
   const headerStore = await headers();
   const origin = getOriginFromHeaders(headerStore);
-  const supabase = await createClient();
+
+  const client = await createAuthClient();
+  if (!client.ok) {
+    return { success: false, error: client.error };
+  }
 
   const attempt = await withAuthTransport(() =>
-    supabase.auth.signUp({
+    client.client.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
@@ -158,9 +194,13 @@ export async function signInWithOAuth(
 ): Promise<ActionResult<{ url: string }>> {
   const headerStore = await headers();
   const origin = getOriginFromHeaders(headerStore);
-  const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const client = await createAuthClient();
+  if (!client.ok) {
+    return { success: false, error: client.error };
+  }
+
+  const { data, error } = await client.client.auth.signInWithOAuth({
     provider,
     options: {
       redirectTo: `${origin}${ROUTES.authCallback}`,
@@ -192,8 +232,16 @@ export async function signInWithOAuth(
  * Sign out and return to the marketing home page.
  */
 export async function signOut(): Promise<void> {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  // A misconfigured or unreachable auth service must not trap the user inside
+  // the app: clearing the session is best-effort, leaving is not. `redirect`
+  // stays outside the guard because it signals via a thrown control-flow error.
+  const client = await createAuthClient();
+  if (client.ok) {
+    await client.client.auth.signOut().catch((error: unknown) => {
+      console.error("[auth] Sign-out call failed; redirecting anyway:", error);
+    });
+  }
+
   revalidatePath("/", "layout");
   redirect(ROUTES.home);
 }

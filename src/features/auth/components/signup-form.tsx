@@ -46,20 +46,30 @@ export function SignupForm() {
       formData.set("confirmPassword", values.confirmPassword);
       formData.set("displayName", values.displayName);
 
-      const result = await signUpWithPassword(null, formData);
-      if (result && !result.success) {
-        toast.error(result.error);
+      // See login-form: an uncaught rejection here surrenders the page to the
+      // root error boundary, which hides the reason the attempt failed.
+      try {
+        const result = await signUpWithPassword(null, formData);
+        if (result && !result.success) {
+          toast.error(result.error);
+        }
+      } catch {
+        toast.error("Couldn't create your account. Please try again.");
       }
     });
   }
 
   async function handleOAuth(provider: "google") {
-    const result = await signInWithOAuth(provider);
-    if (!result.success) {
-      toast.error(result.error);
-      return;
+    try {
+      const result = await signInWithOAuth(provider);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      window.location.href = result.data.url;
+    } catch {
+      toast.error("Couldn't start Google sign-in. Please try again.");
     }
-    window.location.href = result.data.url;
   }
 
   return (
