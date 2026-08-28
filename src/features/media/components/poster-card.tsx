@@ -148,21 +148,21 @@ export function PosterCard({
     >
       <div
         className={cn(
-          "relative aspect-[2/3] overflow-hidden rounded-xl bg-muted shadow-md",
+          "bg-muted relative aspect-[2/3] overflow-hidden rounded-xl shadow-md",
           "transition-shadow duration-500 ease-out",
-          hovered && "shadow-2xl shadow-black/50 ring-1 ring-white/10",
+          hovered && "shadow-2xl ring-1 shadow-black/50 ring-white/10",
         )}
       >
         <Link
           href={href}
           prefetch
-          className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+          className="focus-visible:ring-ring absolute inset-0 z-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
           aria-label={`${item.title}${year ? `, ${year}` : ""}`}
         >
           {src ? (
             <>
               {!loaded ? (
-                <div className="absolute inset-0 skeleton-shimmer" aria-hidden />
+                <div className="skeleton-shimmer absolute inset-0" aria-hidden />
               ) : null}
               <Image
                 src={src}
@@ -179,7 +179,7 @@ export function PosterCard({
               />
             </>
           ) : (
-            <div className="flex h-full items-center justify-center bg-muted p-3 text-center text-xs text-muted-foreground">
+            <div className="bg-muted text-muted-foreground flex h-full items-center justify-center p-3 text-center text-xs">
               {item.title}
             </div>
           )}
@@ -193,17 +193,33 @@ export function PosterCard({
         />
 
         {item.voteAverage != null && item.voteAverage > 0 ? (
-          <div className="pointer-events-none absolute left-2 top-2 z-[1] inline-flex items-center gap-1 rounded-md bg-black/65 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-            <Star className="h-3 w-3 fill-primary text-primary" aria-hidden="true" />
+          <div className="pointer-events-none absolute top-2 left-2 z-[1] inline-flex items-center gap-1 rounded-md bg-black/65 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            <Star className="fill-primary text-primary h-3 w-3" aria-hidden="true" />
             {formatVote(item.voteAverage)}
           </div>
         ) : null}
 
-        {lastStatus && lastStatus in STATUS_BADGE ? (
-          <div className="pointer-events-none absolute right-2 top-2 z-[1] rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-            {STATUS_BADGE[lastStatus as (typeof QUICK_STATUSES)[number]]}
-          </div>
-        ) : null}
+        <AnimatePresence>
+          {lastStatus && lastStatus in STATUS_BADGE ? (
+            <motion.div
+              key="status-badge"
+              initial={
+                reduceMotion ? { opacity: 1 } : { opacity: 0, transform: "scale(0.92)" }
+              }
+              animate={{ opacity: 1, transform: "scale(1)" }}
+              exit={
+                reduceMotion ? { opacity: 0 } : { opacity: 0, transform: "scale(0.96)" }
+              }
+              transition={{
+                duration: reduceMotion ? 0.01 : 0.18,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="pointer-events-none absolute top-2 right-2 z-[1] rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
+            >
+              {STATUS_BADGE[lastStatus as (typeof QUICK_STATUSES)[number]]}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         <AnimatePresence>
           {showActions ? (
@@ -255,7 +271,7 @@ export function PosterCard({
                 onClick={(e) => void setStatus("completed", e)}
                 className={cn(
                   actionBtnClass,
-                  "bg-primary/45 text-white ring-1 ring-primary/40 hover:bg-primary/60",
+                  "bg-primary/45 ring-primary/40 hover:bg-primary/60 text-white ring-1",
                 )}
                 aria-label={`Mark ${item.title} as completed`}
               >
@@ -272,10 +288,10 @@ export function PosterCard({
       </div>
 
       <Link href={href} prefetch className="mt-2 block space-y-0.5 px-0.5">
-        <p className="line-clamp-2 text-sm font-medium leading-snug tracking-tight">
+        <p className="line-clamp-2 text-sm leading-snug font-medium tracking-tight">
           {item.title}
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           {year ?? "—"}
           <span className="mx-1 opacity-40">·</span>
           {item.mediaType === "tv" ? "TV" : "Movie"}

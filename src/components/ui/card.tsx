@@ -3,21 +3,23 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Premium glass surface card.
+ * Boxy panel surface — hairline border, near-square corners, and the corner
+ * tick from the landing page's instrument panels.
  */
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "surface-card text-card-foreground",
-        "rounded-2xl",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { corner?: boolean }
+>(({ className, corner = true, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "surface-card relative text-card-foreground",
+      corner && "panel-corner",
+      className,
+    )}
+    {...props}
+  />
+));
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

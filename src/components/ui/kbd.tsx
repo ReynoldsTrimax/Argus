@@ -10,7 +10,7 @@ export function Kbd({
   return (
     <kbd
       className={cn(
-        "pointer-events-none inline-flex h-6 min-w-6 select-none items-center justify-center rounded-md border-0 bg-muted/70 px-1.5 font-mono text-[11px] font-medium text-muted-foreground dark:bg-white/[0.08]",
+        "pointer-events-none inline-flex h-6 min-w-6 select-none items-center justify-center rounded-sm border border-border bg-transparent px-1.5 font-mono text-[11px] font-medium text-muted-foreground dark:border-white/12",
         className,
       )}
       {...props}

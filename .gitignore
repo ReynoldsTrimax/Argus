@@ -61,3 +61,6 @@ next-env.d.ts
 # Accidental build / local agent folders
 .next*/
 .grok/
+
+# Local agent tooling state
+.codex/

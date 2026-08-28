@@ -14,7 +14,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-lg bg-muted/45 p-1 text-muted-foreground backdrop-blur-md ring-1 ring-border/35 dark:bg-white/[0.06] dark:ring-white/10",
+      "bg-muted/45 text-muted-foreground ring-border/35 inline-flex h-10 items-center justify-center rounded-lg p-1 ring-1 backdrop-blur-md dark:bg-white/[0.06] dark:ring-white/10",
       className,
     )}
     {...props}
@@ -29,11 +29,11 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium",
-      "ring-offset-background transition-all backdrop-blur-md",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap",
+      "ring-offset-background backdrop-blur-md transition-all",
+      "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
       "disabled:pointer-events-none disabled:opacity-50",
-      "data-[state=active]:bg-background/70 data-[state=active]:text-foreground data-[state=active]:shadow-xs data-[state=active]:ring-1 data-[state=active]:ring-border/40 dark:data-[state=active]:bg-white/12 dark:data-[state=active]:ring-white/12",
+      "data-[state=active]:bg-background/70 data-[state=active]:text-foreground data-[state=active]:ring-border/40 data-[state=active]:shadow-xs data-[state=active]:ring-1 dark:data-[state=active]:bg-white/12 dark:data-[state=active]:ring-white/12",
       className,
     )}
     {...props}
@@ -48,7 +48,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "tab-content-enter ring-offset-background focus-visible:ring-ring mt-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
       className,
     )}
     {...props}

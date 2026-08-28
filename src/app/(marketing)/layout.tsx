@@ -1,8 +1,14 @@
 import { MarketingHeader } from "@/components/layout/marketing-header";
+import { APP_NAME } from "@/constants/app";
+import { LANDING_SECTIONS } from "@/features/marketing/sections";
 import { getCurrentUser } from "@/lib/services/user-service";
 
 /**
- * Public marketing layout — header + main + minimal footer.
+ * Public marketing layout.
+ *
+ * The landing page is a deliberately dark stage regardless of the visitor's OS
+ * theme, so `dark` and `landing-stage` are scoped here: the product UI still
+ * follows the system theme, only this route group is pinned.
  */
 export default async function MarketingLayout({
   children,
@@ -18,15 +24,38 @@ export default async function MarketingLayout({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div
+      className="dark landing-stage stage-grain flex min-h-dvh flex-col"
+      style={{ colorScheme: "dark" }}
+    >
       <MarketingHeader isAuthenticated={isAuthenticated} />
+
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <footer className="border-t border-border/30 bg-muted/30 py-10 dark:bg-white/[0.03]">
-        <div className="content-container flex flex-col items-center justify-between gap-3 text-sm text-muted-foreground sm:flex-row">
-          <p>&copy; {new Date().getFullYear()} Argus. Built for long sessions.</p>
-          <p className="text-xs tracking-wide">Your calm cinematic hub</p>
+
+      <footer className="border-t border-white/[0.07]">
+        <div className="content-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
+          <p className="landing-mono">
+            © {new Date().getFullYear()} {APP_NAME}
+          </p>
+
+          {/*
+            The header nav collapses below `lg`, so the footer is the only place
+            small screens can jump between sections. It also keeps the footer
+            from simply repeating the tagline the closing headline just said.
+          */}
+          <nav aria-label="Sections" className="flex flex-wrap gap-x-6 gap-y-2">
+            {LANDING_SECTIONS.map((section) => (
+              <a
+                key={section.href}
+                href={section.href}
+                className="landing-mono rounded-sm transition-colors duration-200 hover:text-white/80"
+              >
+                {section.label}
+              </a>
+            ))}
+          </nav>
         </div>
       </footer>
     </div>

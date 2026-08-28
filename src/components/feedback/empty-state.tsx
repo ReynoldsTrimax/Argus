@@ -15,6 +15,10 @@ interface EmptyStateProps {
 
 /**
  * Reusable empty state for lists, libraries, and future feature placeholders.
+ *
+ * Uses the shared `stagger-children` utility (fade-up, 45ms steps) rather than
+ * a bespoke entrance — an empty state is a first-run surface, which is where the
+ * delight budget belongs. CSS-only, so this stays a Server Component.
  */
 export function EmptyState({
   icon: Icon = Inbox,
@@ -27,17 +31,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-2xl border-0 bg-muted/35 px-6 py-16 text-center dark:bg-white/[0.04]",
+        "stagger-children bg-muted/35 flex flex-col items-center justify-center rounded-2xl border-0 px-6 py-16 text-center dark:bg-white/[0.04]",
         className,
       )}
       role="status"
     >
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
-        <Icon className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+      <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-2xl">
+        <Icon className="text-muted-foreground h-6 w-6" aria-hidden="true" />
       </div>
       <h3 className="text-base font-semibold tracking-tight">{title}</h3>
       {description ? (
-        <p className="mt-1.5 max-w-sm text-sm text-muted-foreground text-pretty">
+        <p className="text-muted-foreground mt-1.5 max-w-sm text-sm text-pretty">
           {description}
         </p>
       ) : null}

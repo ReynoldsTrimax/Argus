@@ -115,9 +115,7 @@ export function PersonalMediaPanel({
     setSpoilers(initial.review?.contains_spoilers ?? false);
     setRating(initial.entry?.user_rating?.toString() ?? "");
     setMovieMinutes(initial.entry?.movie_progress_minutes?.toString() ?? "");
-    setTvSeason(
-      String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1),
-    );
+    setTvSeason(String(initial.entry?.current_season ?? seasons[0]?.seasonNumber ?? 1));
     setTvEpisode(String(initial.entry?.current_episode ?? 1));
   }
 
@@ -126,8 +124,7 @@ export function PersonalMediaPanel({
       ? seasons
       : [{ seasonNumber: 1, name: "Season 1", episodeCount: null }];
   const selectedSeasonMeta =
-    seasonOptions.find((s) => String(s.seasonNumber) === tvSeason) ??
-    seasonOptions[0]!;
+    seasonOptions.find((s) => String(s.seasonNumber) === tvSeason) ?? seasonOptions[0]!;
   const maxEpisode = Math.max(1, selectedSeasonMeta.episodeCount ?? 50);
 
   const state = initial;
@@ -164,7 +161,7 @@ export function PersonalMediaPanel({
   return (
     <aside
       className={cn(
-        "space-y-4 rounded-3xl border-0 bg-muted/40 dark:bg-white/[0.05] p-4 shadow-sm sm:p-5",
+        "bg-muted/40 space-y-4 rounded-3xl border-0 p-4 shadow-sm sm:p-5 dark:bg-white/[0.05]",
         pending && "opacity-90",
       )}
       aria-busy={pending}
@@ -172,13 +169,13 @@ export function PersonalMediaPanel({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-section-title text-[1.05rem]">Have you watched it?</h2>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-[11px] leading-relaxed">
             {statusLabel}
             {state.entry?.is_favorite ? " · Favorite" : ""}
           </p>
         </div>
         {pending ? (
-          <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0 animate-spin" />
         ) : null}
       </div>
 
@@ -275,7 +272,7 @@ export function PersonalMediaPanel({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="status-select" className="text-xs text-muted-foreground">
+        <Label htmlFor="status-select" className="text-muted-foreground text-xs">
           All statuses
         </Label>
         <Select
@@ -297,21 +294,21 @@ export function PersonalMediaPanel({
       </div>
 
       {state.entry && state.entry.progress_percent > 0 ? (
-        <div className="space-y-1.5 rounded-xl bg-muted/40 px-3 py-2.5">
-          <div className="flex justify-between text-[11px] text-muted-foreground">
+        <div className="panel-block-enter bg-muted/40 space-y-1.5 rounded-xl px-3 py-2.5">
+          <div className="text-muted-foreground flex justify-between text-[11px]">
             <span>Progress</span>
             <span>{Math.round(state.entry.progress_percent)}%</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+          <div className="bg-muted h-1.5 overflow-hidden rounded-full">
             <div
-              className="h-full rounded-full bg-primary"
+              className="bg-primary h-full rounded-full"
               style={{ width: `${state.entry.progress_percent}%` }}
             />
           </div>
           {identity.mediaType === "tv" &&
           currentStatus !== "completed" &&
           state.entry.current_season != null ? (
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-muted-foreground text-[11px]">
               S{state.entry.current_season}E{state.entry.current_episode ?? "—"} ·{" "}
               {state.entry.episodes_watched} episodes
             </p>
@@ -321,7 +318,7 @@ export function PersonalMediaPanel({
 
       {identity.mediaType === "movie" ? (
         <div className="space-y-1.5">
-          <Label htmlFor="movie-progress" className="text-xs text-muted-foreground">
+          <Label htmlFor="movie-progress" className="text-muted-foreground text-xs">
             Progress (minutes)
           </Label>
           <div className="flex gap-1.5">
@@ -331,7 +328,9 @@ export function PersonalMediaPanel({
               min={0}
               value={movieMinutes}
               onChange={(e) => setMovieMinutes(e.target.value)}
-              placeholder={identity.runtimeMinutes ? `of ${identity.runtimeMinutes}` : "0"}
+              placeholder={
+                identity.runtimeMinutes ? `of ${identity.runtimeMinutes}` : "0"
+              }
               className="h-8 text-xs"
             />
             <Button
@@ -360,10 +359,10 @@ export function PersonalMediaPanel({
 
       {/* Progress picker: watching / paused / dropped (not completed — full run is assumed). */}
       {identity.mediaType === "tv" && currentStatus !== "completed" ? (
-        <div className="space-y-2 rounded-xl border-0 bg-muted/30 dark:bg-white/[0.04] p-3">
+        <div className="panel-block-enter bg-muted/30 space-y-2 rounded-xl border-0 p-3 dark:bg-white/[0.04]">
           <div>
-            <p className="text-xs font-medium text-foreground">Watched up to</p>
-            <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+            <p className="text-foreground text-xs font-medium">Watched up to</p>
+            <p className="text-muted-foreground mt-0.5 text-[11px] leading-relaxed">
               {currentStatus === "dropped"
                 ? "Log how far you got before dropping — still counts toward hours."
                 : "Set season & episode — hours go to your total watched."}
@@ -371,7 +370,7 @@ export function PersonalMediaPanel({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="tv-season" className="text-[11px] text-muted-foreground">
+              <Label htmlFor="tv-season" className="text-muted-foreground text-[11px]">
                 Season
               </Label>
               <Select
@@ -396,7 +395,7 @@ export function PersonalMediaPanel({
               </Select>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="tv-episode" className="text-[11px] text-muted-foreground">
+              <Label htmlFor="tv-episode" className="text-muted-foreground text-[11px]">
                 Episode
               </Label>
               <Input
@@ -454,10 +453,9 @@ export function PersonalMediaPanel({
             Save episode progress
           </Button>
           {state.entry?.current_season != null ? (
-            <p className="text-[11px] text-muted-foreground">
-              Current: S{state.entry.current_season}E
-              {state.entry.current_episode ?? "—"} ·{" "}
-              {state.entry.episodes_watched} ep
+            <p className="text-muted-foreground text-[11px]">
+              Current: S{state.entry.current_season}E{state.entry.current_episode ?? "—"}{" "}
+              · {state.entry.episodes_watched} ep
               {identity.runtimeMinutes
                 ? ` · ~${Math.round(((state.entry.episodes_watched || 0) * identity.runtimeMinutes) / 60)}h`
                 : ""}
@@ -470,7 +468,7 @@ export function PersonalMediaPanel({
 
       {/* Rating */}
       <div className="space-y-1.5">
-        <Label htmlFor="rating" className="text-xs text-muted-foreground">
+        <Label htmlFor="rating" className="text-muted-foreground text-xs">
           Your rating (0–{maxRating})
         </Label>
         <div className="flex gap-1.5">
@@ -508,7 +506,7 @@ export function PersonalMediaPanel({
           </Button>
         </div>
         {state.ratingHistory.length > 0 ? (
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-muted-foreground text-[11px]">
             History:{" "}
             {state.ratingHistory
               .slice(0, 3)
@@ -520,7 +518,7 @@ export function PersonalMediaPanel({
 
       {/* Review */}
       <div className="space-y-1.5">
-        <Label htmlFor="review" className="text-xs text-muted-foreground">
+        <Label htmlFor="review" className="text-muted-foreground text-xs">
           Review
         </Label>
         <Textarea
@@ -532,7 +530,7 @@ export function PersonalMediaPanel({
           className="min-h-[4.5rem] resize-y text-xs"
         />
         <div className="flex items-center justify-between gap-2">
-          <label className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <label className="text-muted-foreground flex items-center gap-2 text-[11px]">
             <Switch checked={spoilers} onCheckedChange={setSpoilers} />
             Spoilers
           </label>
@@ -558,7 +556,7 @@ export function PersonalMediaPanel({
 
       {/* Notes */}
       <div className="space-y-1.5">
-        <Label htmlFor="note" className="text-xs text-muted-foreground">
+        <Label htmlFor="note" className="text-muted-foreground text-xs">
           Private notes
         </Label>
         {state.notes.length ? (
@@ -566,10 +564,10 @@ export function PersonalMediaPanel({
             {state.notes.map((n) => (
               <div
                 key={n.id}
-                className="rounded-lg border-0 bg-muted/30 dark:bg-white/[0.04] p-2 text-[11px]"
+                className="bg-muted/30 rounded-lg border-0 p-2 text-[11px] dark:bg-white/[0.04]"
               >
-                <p className="whitespace-pre-wrap text-foreground/90">{n.body}</p>
-                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                <p className="text-foreground/90 whitespace-pre-wrap">{n.body}</p>
+                <div className="text-muted-foreground mt-1 flex justify-between text-[10px]">
                   <span>{new Date(n.created_at).toLocaleDateString()}</span>
                   <button
                     type="button"
@@ -619,7 +617,7 @@ export function PersonalMediaPanel({
 
       {/* Tags */}
       <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">Tags</Label>
+        <Label className="text-muted-foreground text-xs">Tags</Label>
         {state.tags.length ? (
           <div className="flex flex-wrap gap-1">
             {state.tags.map((t) => (
@@ -693,7 +691,7 @@ export function PersonalMediaPanel({
 
       {/* Collections */}
       <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">Collections</Label>
+        <Label className="text-muted-foreground text-xs">Collections</Label>
         {state.collections.length ? (
           <div className="flex flex-wrap gap-1">
             {state.collections.map((c) => (

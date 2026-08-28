@@ -2,6 +2,7 @@ import { createBrowserClient } from "@supabase/ssr";
 
 import type { Database } from "@/types/database";
 import { getClientEnv } from "@/lib/env";
+import { supabaseFetch } from "@/lib/supabase/fetch";
 
 /**
  * Browser Supabase client for Client Components.
@@ -13,5 +14,6 @@ export function createClient() {
   return createBrowserClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    { global: { fetch: supabaseFetch } },
   );
 }

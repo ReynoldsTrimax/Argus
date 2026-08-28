@@ -162,7 +162,7 @@ function HoverHighlight() {
           className={cn(
             "pointer-events-none absolute z-0",
             /* Sharper squircle — ~10px, not stadium pill */
-            "rounded-[10px]",
+            "rounded-sm",
             "bg-black/[0.04] dark:bg-white/[0.075]",
             "shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]",
             "dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]",
@@ -228,7 +228,7 @@ export const Sidebar001Item = memo(function Sidebar001Item({
           aria-label={typeof label === "string" ? label : undefined}
           aria-current={isActive ? "page" : undefined}
           className={cn(
-            "relative flex h-9 w-9 items-center justify-center rounded-[10px]",
+            "relative flex h-9 w-9 items-center justify-center rounded-sm",
             "text-muted-foreground transition-colors",
             isActive
               ? "bg-black/[0.06] text-foreground dark:bg-white/[0.1]"
@@ -310,7 +310,7 @@ export const Sidebar001Item = memo(function Sidebar001Item({
             onMouseLeave={() => setHovered(null)}
             className={cn(
               "relative z-[1] inline-flex max-w-full items-center gap-2",
-              "rounded-[10px] px-3 py-[0.4rem] select-none",
+              "rounded-sm px-3 py-[0.4rem] select-none",
               "text-[0.9rem] font-medium tracking-[-0.01em] leading-snug",
               "transition-colors duration-150",
               isActive || isHovered

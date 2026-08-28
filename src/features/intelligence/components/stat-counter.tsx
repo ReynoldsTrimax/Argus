@@ -60,16 +60,13 @@ export function StatCounter({
   return (
     <div
       className={cn(
-        "hover-lift flex h-full min-h-[8.5rem] flex-col rounded-2xl border-0 bg-muted/40 p-4 dark:bg-white/[0.05]",
-        "transition-colors duration-300 hover:bg-muted/60 dark:hover:bg-white/[0.08]",
+        "surface-card panel-corner relative flex h-full min-h-[8.5rem] flex-col p-4",
         className,
       )}
     >
       {header ? <div className="mb-2 shrink-0">{header}</div> : null}
-      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 font-display text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl">
+      <p className="text-eyebrow">{label}</p>
+      <p className="text-numeric mt-2 text-2xl sm:text-3xl">
         {decimals > 0
           ? display.toFixed(decimals)
           : new Intl.NumberFormat("en-US").format(Math.round(display))}

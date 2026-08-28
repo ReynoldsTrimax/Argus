@@ -90,7 +90,7 @@ function SidebarChrome() {
         type="button"
         variant="ghost"
         size="icon-sm"
-        className="rounded-[10px] text-muted-foreground hover:text-foreground"
+        className="rounded-sm text-muted-foreground hover:text-foreground"
         onClick={() => setSidebarCollapsed((c) => !c)}
         aria-label={sidebarCollapsed ? "Expand menu" : "Collapse menu"}
         aria-expanded={!sidebarCollapsed}
@@ -122,7 +122,7 @@ export function Sidebar() {
 
   return (
     <Sidebar001
-      className="sticky top-0 z-40 hidden h-dvh border-r border-border/30 md:flex"
+      className="sticky top-0 z-40 hidden h-dvh border-r border-border md:flex dark:border-white/[0.08]"
       collapsed={sidebarCollapsed}
       collapsedWidth={LAYOUT.sidebarCollapsedWidth}
       defaultWidth={268}

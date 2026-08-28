@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Source_Sans_3, Geist_Mono } from "next/font/google";
+import { Source_Sans_3, Geist_Mono } from "next/font/google";
 
 import { AppProviders } from "@/providers/app-providers";
 import { SkipLink } from "@/components/layout/skip-link";
@@ -9,19 +9,8 @@ import { APP_METADATA } from "@/constants/app";
 import "./globals.css";
 
 /**
- * Display / topic face — Fraunces (soft optical serif with real bold weights).
- * Used for brand, page titles, section headers, movie titles.
- */
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-  axes: ["SOFT", "WONK", "opsz"],
-});
-
-/**
  * Body / context face — Source Sans 3 (soft, highly readable).
- * Used for overviews, descriptions, UI chrome, forms, meta.
+ * Used for overviews, descriptions, values, forms, meta.
  */
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
@@ -30,11 +19,18 @@ const sourceSans = Source_Sans_3({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-/** Mono only for code / technical snippets. */
+/**
+ * Display / brand / label face — Geist Mono.
+ *
+ * The instrument-panel voice: the Argus wordmark, page and rail titles, and
+ * every uppercase tracked-out label and numeral. Paired against Source Sans 3
+ * for prose, so the two faces stay clearly different jobs.
+ */
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -107,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${sourceSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sourceSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -118,7 +114,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-dvh bg-background font-sans text-foreground">
+      <body className="bg-background text-foreground min-h-dvh font-sans">
         <SkipLink />
         <AppProviders>
           {children}

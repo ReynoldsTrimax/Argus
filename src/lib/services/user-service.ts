@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { withAuthBudget } from "@/lib/supabase/fetch";
 import type { Profile, UserPreferences, UserSettings } from "@/types";
 
 /**
@@ -6,18 +7,28 @@ import type { Profile, UserPreferences, UserSettings } from "@/types";
  * Keeps Supabase queries out of page components for cleaner composition.
  */
 
+/**
+ * The signed-in user, or `null`.
+ *
+ * Bounded by a total-time budget: this runs in ~20 render paths (including the
+ * public marketing layout), and an unresponsive auth service would otherwise
+ * stall each of them for as long as the Supabase SDK keeps retrying. Treating a
+ * stalled check as "signed out" degrades to the public view instead of hanging.
+ */
 export async function getCurrentUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  return withAuthBudget(async () => {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    return null;
-  }
+    if (error || !user) {
+      return null;
+    }
 
-  return user;
+    return user;
+  }, null);
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {

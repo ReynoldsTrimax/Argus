@@ -3,29 +3,28 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Mono status chip — sharp, hairline, uppercase and tracked, matching the
+ * "STRONG" / "12-DAY STREAK" tags on the product panels.
+ */
 const badgeVariants = cva(
   [
-    "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium",
-    "backdrop-blur-md transition-colors duration-200",
+    "inline-flex items-center rounded-sm border px-2 py-0.5",
+    "font-mono text-[0.625rem] font-medium uppercase tracking-[0.16em]",
+    "transition-colors duration-200",
     "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   ].join(" "),
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary/65 text-primary-foreground shadow-xs ring-1 ring-primary/30",
+        default: "border-primary/45 bg-primary/12 text-primary",
         secondary:
-          "border-transparent bg-secondary/55 text-secondary-foreground ring-1 ring-border/35 dark:bg-white/[0.1] dark:ring-white/10",
-        destructive:
-          "border-transparent bg-destructive/65 text-destructive-foreground shadow-xs ring-1 ring-destructive/30",
-        outline:
-          "border-transparent bg-muted/45 text-foreground ring-1 ring-border/40 dark:bg-white/[0.08] dark:ring-white/10",
-        success:
-          "border-transparent bg-success/20 text-success ring-1 ring-success/25",
-        warning:
-          "border-transparent bg-warning/20 text-warning ring-1 ring-warning/25",
-        muted:
-          "border-transparent bg-muted/50 text-muted-foreground ring-1 ring-border/30 dark:bg-white/[0.08] dark:ring-white/8",
+          "border-border bg-secondary text-secondary-foreground dark:border-white/10",
+        destructive: "border-destructive/45 bg-destructive/12 text-destructive",
+        outline: "border-border bg-transparent text-foreground dark:border-white/12",
+        success: "border-success/40 bg-success/12 text-success",
+        warning: "border-warning/40 bg-warning/12 text-warning",
+        muted: "border-border/60 bg-transparent text-muted-foreground dark:border-white/8",
       },
     },
     defaultVariants: {

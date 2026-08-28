@@ -53,7 +53,7 @@ export function SignupForm() {
     });
   }
 
-  async function handleOAuth(provider: "google" | "github") {
+  async function handleOAuth(provider: "google") {
     const result = await signInWithOAuth(provider);
     if (!result.success) {
       toast.error(result.error);

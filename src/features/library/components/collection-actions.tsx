@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HoldToConfirmButton } from "@/features/library/components/hold-to-confirm-button";
 import {
   actionDeleteCollection,
   actionUpdateCollection,
@@ -86,14 +87,12 @@ export function CollectionActions({
         >
           {isPinned ? "Unpin" : "Pin"}
         </Button>
-        <Button
-          type="button"
+        <HoldToConfirmButton
           size="sm"
-          variant="destructive"
           disabled={pending}
-          onClick={() =>
+          holdLabel={`Hold to delete the collection “${name}”`}
+          onConfirm={() =>
             startTransition(async () => {
-              if (!confirm("Delete this collection?")) return;
               const res = await actionDeleteCollection(collectionId);
               if (!res.success) toast.error(res.error);
               else {
@@ -104,8 +103,8 @@ export function CollectionActions({
             })
           }
         >
-          Delete
-        </Button>
+          Hold to delete
+        </HoldToConfirmButton>
       </div>
     </div>
   );

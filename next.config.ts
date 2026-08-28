@@ -7,12 +7,27 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  /*
+   * Next blocks dev-only resources (/_next/webpack-hmr and friends) when the
+   * request origin is not the one the server considers canonical. Opening the
+   * app on 127.0.0.1 while the server reports localhost silently breaks HMR and
+   * hydration, which looks exactly like a page that loads forever.
+   *
+   * Development only; it has no effect on a production build. Add a LAN address
+   * here too if you test from a phone on the same network.
+   */
+  allowedDevOrigins: ["localhost", "127.0.0.1", "[::1]"],
   images: {
     // Bypass Vercel Image Optimization — free/hobby plans can return
     // OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED (402) and break all posters.
-    // TMDB already serves sized URLs (w342, w780, etc.).
+    // The custom loader asks TMDB's CDN for the width Next actually needs.
     loader: "custom",
     loaderFile: "./src/lib/media/image-loader.ts",
+    // Every candidate width below is a size TMDB actually serves, so each
+    // srcset entry resolves to a real image instead of a 400. Keep these in
+    // sync with TMDB_WIDTHS in src/lib/media/image-loader.ts.
+    imageSizes: [45, 92, 154, 185],
+    deviceSizes: [300, 342, 500, 780, 1280],
     remotePatterns: [
       {
         protocol: "https",
