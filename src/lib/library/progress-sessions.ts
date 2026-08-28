@@ -268,6 +268,222 @@ export async function setTvProgressPosition(
   return { episodesWatched, progressPercent: progress, minutesAdded };
 }
 
+/**
+ * Recomputes entry-level rollups from the `episode_progress` rows.
+ *
+ * Every episode mutation has to answer the same four questions — how many
+ * episodes are watched, what percent that is, where the user is now, and what
+ * the status should be. Deriving all of it from the rows in one place means a
+ * toggle and an untoggle can never disagree, which is what allowed the previous
+ * unmark path to leave `current_season`/`current_episode` pointing at an episode
+ * the user had just unchecked.
+ *
+ * `current_*` is set to the furthest watched episode rather than the one just
+ * touched, so unchecking the latest episode walks the position back instead of
+ * stranding it ahead of real progress.
+ */
+async function recalcEntryProgress(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  entryId: string,
+  options?: { totalEpisodes?: number | null },
+): Promise<{ episodesWatched: number; progressPercent: number }> {
+  const now = new Date().toISOString();
+
+  const { data: watchedRows } = await table(supabase, "episode_progress")
+    .select("season_number, episode_number, runtime_minutes")
+    .eq("user_id", userId)
+    .eq("entry_id", entryId)
+    .eq("is_watched", true)
+    .order("season_number")
+    .order("episode_number");
+
+  const rows = (watchedRows ?? []) as {
+    season_number: number;
+    episode_number: number;
+    runtime_minutes: number | null;
+  }[];
+
+  const { data: entry } = await table(supabase, "library_entries")
+    .select("*")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .single();
+
+  if (!entry) throw new Error("Library entry not found");
+
+  const episodesWatched = rows.length;
+  const totalEpisodes =
+    options?.totalEpisodes ?? (entry.total_episodes as number | null) ?? null;
+
+  const progressPercent =
+    totalEpisodes && totalEpisodes > 0
+      ? Math.min(100, Math.round((episodesWatched / totalEpisodes) * 10000) / 100)
+      : 0;
+
+  const furthest = rows[rows.length - 1] ?? null;
+
+  // Never silently overwrite a deliberate "dropped". Otherwise: any progress on
+  // an untracked/planned title means watching, a full run means completed, and
+  // dropping back below 100% reopens a previously completed run.
+  const status =
+    entry.status === "dropped"
+      ? "dropped"
+      : progressPercent >= 100
+        ? "completed"
+        : episodesWatched === 0
+          ? entry.status
+          : entry.status === "plan_to_watch" ||
+              entry.status === "wishlist" ||
+              entry.status === "completed"
+            ? "watching"
+            : entry.status;
+
+  await table(supabase, "library_entries")
+    .update({
+      current_season: furthest?.season_number ?? null,
+      current_episode: furthest?.episode_number ?? null,
+      episodes_watched: episodesWatched,
+      total_episodes: totalEpisodes,
+      progress_percent: progressPercent,
+      status,
+      last_watched_at: episodesWatched > 0 ? now : entry.last_watched_at,
+      started_at: entry.started_at ?? (episodesWatched > 0 ? now : null),
+      completed_at: progressPercent >= 100 ? (entry.completed_at ?? now) : null,
+    })
+    .eq("id", entryId)
+    .eq("user_id", userId);
+
+  // Season rollups for every season the user has rows in, so a season that just
+  // dropped to zero is corrected rather than left at its old count.
+  const bySeason = new Map<number, number>();
+  for (const row of rows) {
+    bySeason.set(row.season_number, (bySeason.get(row.season_number) ?? 0) + 1);
+  }
+
+  const { data: touchedSeasons } = await table(supabase, "episode_progress")
+    .select("season_number")
+    .eq("user_id", userId)
+    .eq("entry_id", entryId);
+
+  const seasonNumbers = new Set<number>([
+    ...bySeason.keys(),
+    ...((touchedSeasons ?? []) as { season_number: number }[]).map(
+      (r) => r.season_number,
+    ),
+  ]);
+
+  for (const seasonNumber of seasonNumbers) {
+    await table(supabase, "season_progress").upsert(
+      {
+        user_id: userId,
+        entry_id: entryId,
+        season_number: seasonNumber,
+        episodes_watched: bySeason.get(seasonNumber) ?? 0,
+        is_completed: false,
+      },
+      { onConflict: "entry_id,season_number" },
+    );
+  }
+
+  return { episodesWatched, progressPercent };
+}
+
+/**
+ * Marks or unmarks every episode in a season in one round trip.
+ *
+ * The per-episode path is fine for a single tap but a 24-episode season would
+ * fire 24 sequential writes and 24 recalculations, so the whole set is upserted
+ * at once and the rollup runs a single time at the end.
+ */
+export async function setSeasonWatched(
+  userId: string,
+  entryId: string,
+  seasonNumber: number,
+  episodeNumbers: number[],
+  watched: boolean,
+  meta?: { runtimeMinutes?: number | null; totalEpisodes?: number | null },
+): Promise<{ episodesWatched: number; progressPercent: number; changed: number }> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+
+  if (episodeNumbers.length === 0) {
+    const rollup = await recalcEntryProgress(supabase, userId, entryId, {
+      totalEpisodes: meta?.totalEpisodes ?? null,
+    });
+    return { ...rollup, changed: 0 };
+  }
+
+  // Count what actually changes so hours are credited only for new episodes.
+  const { data: existing } = await table(supabase, "episode_progress")
+    .select("episode_number, is_watched")
+    .eq("user_id", userId)
+    .eq("entry_id", entryId)
+    .eq("season_number", seasonNumber);
+
+  const previously = new Map(
+    ((existing ?? []) as { episode_number: number; is_watched: boolean }[]).map((r) => [
+      r.episode_number,
+      r.is_watched,
+    ]),
+  );
+  const changed = episodeNumbers.filter(
+    (n) => (previously.get(n) ?? false) !== watched,
+  ).length;
+
+  await table(supabase, "episode_progress").upsert(
+    episodeNumbers.map((episodeNumber) => ({
+      user_id: userId,
+      entry_id: entryId,
+      season_number: seasonNumber,
+      episode_number: episodeNumber,
+      is_watched: watched,
+      watched_at: watched ? now : null,
+      runtime_minutes: meta?.runtimeMinutes ?? null,
+    })),
+    { onConflict: "entry_id,season_number,episode_number" },
+  );
+
+  const rollup = await recalcEntryProgress(supabase, userId, entryId, {
+    totalEpisodes: meta?.totalEpisodes ?? null,
+  });
+
+  const { data: entry } = await table(supabase, "library_entries")
+    .select("title")
+    .eq("id", entryId)
+    .single();
+
+  // One session row for the batch, so bulk-marking a season credits its hours
+  // without inserting a row per episode.
+  const runtime = meta?.runtimeMinutes ?? null;
+  if (watched && changed > 0 && runtime && runtime > 0) {
+    await table(supabase, "watch_sessions").insert({
+      user_id: userId,
+      entry_id: entryId,
+      session_date: now.slice(0, 10),
+      started_at: now,
+      ended_at: now,
+      duration_minutes: changed * runtime,
+      season_number: seasonNumber,
+      episode_number: episodeNumbers[episodeNumbers.length - 1] ?? null,
+      is_rewatch: false,
+      notes: `Marked season ${seasonNumber} (+${changed} ep)`,
+    });
+  }
+
+  if (changed > 0) {
+    await logActivity(supabase, userId, {
+      activityType: "episode_watched",
+      summary: `${watched ? "Marked" : "Cleared"} season ${seasonNumber} of ${entry?.title ?? "show"} (${changed} episode${changed === 1 ? "" : "s"})`,
+      entryId,
+      title: entry?.title,
+      metadata: { seasonNumber, changed, watched },
+    });
+  }
+
+  return { ...rollup, changed };
+}
+
 export async function unmarkEpisode(
   userId: string,
   entryId: string,
@@ -282,28 +498,9 @@ export async function unmarkEpisode(
     .eq("season_number", seasonNumber)
     .eq("episode_number", episodeNumber);
 
-  const { count: totalWatched } = await table(supabase, "episode_progress")
-    .select("*", { count: "exact", head: true })
-    .eq("entry_id", entryId)
-    .eq("is_watched", true);
-
-  const { data: entry } = await table(supabase, "library_entries")
-    .select("total_episodes")
-    .eq("id", entryId)
-    .single();
-
-  const total = entry?.total_episodes as number | null;
-  const watched = totalWatched ?? 0;
-  const progress =
-    total && total > 0 ? Math.min(100, Math.round((watched / total) * 10000) / 100) : 0;
-
-  await table(supabase, "library_entries")
-    .update({
-      episodes_watched: watched,
-      progress_percent: progress,
-    })
-    .eq("id", entryId)
-    .eq("user_id", userId);
+  // Shared rollup: also corrects season_progress and walks current_season /
+  // current_episode back, which the previous inline version left stale.
+  await recalcEntryProgress(supabase, userId, entryId);
 }
 
 export async function listEpisodeProgress(

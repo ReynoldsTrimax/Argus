@@ -233,6 +233,11 @@ export interface PersonalMediaState {
   collections: Collection[];
   recentSessions: WatchSession[];
   ratingHistory: { id: string; value: number; scale: RatingScale; created_at: string }[];
+  /**
+   * Per-episode watch rows for TV titles, used to render the season checklist.
+   * Empty for movies and for titles with no library entry yet.
+   */
+  episodeProgress: EpisodeProgress[];
 }
 
 export interface LibraryListFilters {

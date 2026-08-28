@@ -16,6 +16,7 @@ import {
   Sparkles,
   Tv,
   User,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -47,6 +48,12 @@ export const MAIN_NAV: readonly NavItem[] = [
     href: ROUTES.library,
     icon: Library,
     description: "Your personal library",
+  },
+  {
+    title: "Friends",
+    href: ROUTES.friends,
+    icon: Users,
+    description: "What friends are watching",
   },
   {
     title: "Stats",

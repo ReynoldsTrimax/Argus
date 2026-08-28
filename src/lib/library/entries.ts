@@ -215,6 +215,52 @@ export async function setFavorite(
   return entry;
 }
 
+/**
+ * Removes a title from the library entirely.
+ *
+ * Every child table references `library_entries` with `ON DELETE CASCADE`, so
+ * this also discards episode progress, watch sessions, rating history, the
+ * review and its versions, notes, tag assignments and collection memberships.
+ * Callers are responsible for confirming when any of that exists — see
+ * `PersonalMediaPanel`, which only removes silently for an entry that holds
+ * nothing but a status.
+ *
+ * The activity record is written after the delete with no `entryId`, so the
+ * history keeps a readable trace of the removal instead of a row whose
+ * reference was just nulled out by the foreign key.
+ */
+export async function deleteLibraryEntry(
+  userId: string,
+  entryId: string,
+): Promise<{ title: string | null }> {
+  const supabase = await createClient();
+
+  const { data: existing } = await table(supabase, "library_entries")
+    .select("title")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .single();
+
+  const title = (existing?.title as string | null) ?? null;
+
+  const { error } = await table(supabase, "library_entries")
+    .delete()
+    .eq("id", entryId)
+    .eq("user_id", userId);
+
+  if (error) throw new Error(error.message ?? "Failed to remove from library");
+
+  await logActivity(supabase, userId, {
+    // `activity_type` has no removal member and extending a Postgres enum needs
+    // a migration, so the nearest existing member carries it.
+    activityType: "status_changed",
+    summary: `Removed ${title ?? "a title"} from library`,
+    title,
+  });
+
+  return { title };
+}
+
 export async function setPinned(
   userId: string,
   entryId: string,

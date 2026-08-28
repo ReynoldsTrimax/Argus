@@ -29,6 +29,9 @@ export const ROUTES = {
   activity: "/activity",
   collections: "/collections",
   collectionDetail: (id: string) => `/collections/${id}`,
+  // Social
+  friends: "/friends",
+  userProfile: (username: string) => `/u/${username}`,
   // Intelligence (Phase 4)
   stats: "/stats",
   insights: "/insights",
@@ -58,6 +61,8 @@ export const PROTECTED_ROUTES: readonly string[] = [
   ROUTES.history,
   ROUTES.activity,
   ROUTES.collections,
+  ROUTES.friends,
+  "/u",
   ROUTES.stats,
   ROUTES.insights,
   ROUTES.calendar,
