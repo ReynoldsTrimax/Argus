@@ -36,9 +36,18 @@ export default async function MarketingLayout({
 
       <footer className="border-t border-white/[0.07]">
         <div className="content-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
-          <p className="landing-mono">
-            © {new Date().getFullYear()} {APP_NAME}
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <p className="landing-mono">
+              © {new Date().getFullYear()} {APP_NAME}
+            </p>
+
+            {/*
+              Credit line. Same mono treatment as the copyright rather than a
+              styled signature block — on a page this quiet, a byline that asks
+              for attention is the one thing that would look out of place.
+            */}
+            <p className="landing-mono">By Ishaan &amp; Paarth</p>
+          </div>
 
           {/*
             The header nav collapses below `lg`, so the footer is the only place
