@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Users } from "lucide-react";
 
@@ -16,11 +15,12 @@ import {
   RequestActions,
   RemoveFriendButton,
 } from "@/features/social/components/friend-controls";
+import { FriendPosterRail } from "@/features/social/components/friend-poster-rail";
+import { fromActivityItem } from "@/features/social/friend-title-item";
 import { LibraryVisibilityControl } from "@/features/social/components/library-visibility-control";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { ROUTES } from "@/constants/routes";
-import { mediaHref } from "@/lib/media/routes";
 import type { LibraryVisibility } from "@/types/social";
 
 export const metadata: Metadata = {
@@ -49,9 +49,8 @@ export default async function FriendsPage() {
     })),
   );
 
-  const visibility =
-    ((profile as { library_visibility?: LibraryVisibility } | null)
-      ?.library_visibility ?? "friends") as LibraryVisibility;
+  const visibility = ((profile as { library_visibility?: LibraryVisibility } | null)
+    ?.library_visibility ?? "friends") as LibraryVisibility;
 
   return (
     <div className="animate-fade-up space-y-8">
@@ -59,9 +58,7 @@ export default async function FriendsPage() {
         <h1 className="text-page-title">Friends</h1>
         <p className="text-muted-foreground text-sm">
           Follow what people you know are watching. Your username is{" "}
-          <span className="text-foreground font-medium">
-            @{profile?.username ?? "—"}
-          </span>{" "}
+          <span className="text-foreground font-medium">@{profile?.username ?? "—"}</span>{" "}
           — share it so friends can find you.
         </p>
       </header>
@@ -106,7 +103,8 @@ export default async function FriendsPage() {
 
       <section className="space-y-3" aria-label="Your friends">
         <h2 className="text-section-title">
-          Your friends {friends.length > 0 ? <Badge variant="muted">{friends.length}</Badge> : null}
+          Your friends{" "}
+          {friends.length > 0 ? <Badge variant="muted">{friends.length}</Badge> : null}
         </h2>
 
         {friends.length === 0 ? (
@@ -120,13 +118,15 @@ export default async function FriendsPage() {
             {activity.map((friend) => (
               <li
                 key={friend.friendshipId}
-                className="space-y-3 rounded-2xl bg-muted/40 p-4 dark:bg-white/[0.05]"
+                className="bg-muted/40 space-y-3 rounded-2xl p-4 dark:bg-white/[0.05]"
               >
                 <ul className="contents">
                   <PersonRow profile={friend.profile}>
                     <RemoveFriendButton
                       friendshipId={friend.friendshipId}
-                      name={friend.profile.display_name || friend.profile.username || "friend"}
+                      name={
+                        friend.profile.display_name || friend.profile.username || "friend"
+                      }
                     />
                   </PersonRow>
                 </ul>
@@ -137,14 +137,14 @@ export default async function FriendsPage() {
                   </p>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <FriendRail
+                    <FriendPosterRail
                       heading="Watching now"
-                      items={friend.watchingNow}
+                      items={friend.watchingNow.map(fromActivityItem)}
                       empty="Nothing in progress."
                     />
-                    <FriendRail
+                    <FriendPosterRail
                       heading="Recently finished"
-                      items={friend.recentlyWatched}
+                      items={friend.recentlyWatched.map(fromActivityItem)}
                       empty="Nothing completed yet."
                     />
                   </div>
@@ -154,53 +154,6 @@ export default async function FriendsPage() {
           </ul>
         )}
       </section>
-    </div>
-  );
-}
-
-interface FriendRailProps {
-  heading: string;
-  items: {
-    entryId: string;
-    title: string;
-    mediaType: "movie" | "tv";
-    externalId: string;
-    currentSeason: number | null;
-    currentEpisode: number | null;
-    progressPercent: number;
-  }[];
-  empty: string;
-}
-
-/** A short titled list of a friend's titles, linking into the catalog. */
-function FriendRail({ heading, items, empty }: FriendRailProps) {
-  return (
-    <div className="space-y-1.5 rounded-xl bg-background/40 p-3 dark:bg-black/20">
-      <p className="text-muted-foreground text-[11px] font-medium tracking-[0.04em] uppercase">
-        {heading}
-      </p>
-      {items.length === 0 ? (
-        <p className="text-muted-foreground text-xs">{empty}</p>
-      ) : (
-        <ul className="space-y-1">
-          {items.map((item) => (
-            <li key={item.entryId} className="min-w-0">
-              <Link
-                href={mediaHref(item.mediaType, item.externalId)}
-                className="block min-w-0 truncate text-xs underline-offset-4 hover:underline"
-              >
-                {item.title}
-                {item.mediaType === "tv" && item.currentSeason != null ? (
-                  <span className="text-muted-foreground">
-                    {" "}
-                    · S{item.currentSeason}E{item.currentEpisode ?? "—"}
-                  </span>
-                ) : null}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

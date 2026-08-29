@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, Sparkles } from "lucide-react";
 
 import { getCurrentUser } from "@/lib/services/user-service";
 import { getProfileWithRelationship, getFriendLibrary } from "@/lib/social/profiles";
 import { ProfileFriendAction } from "@/features/social/components/friend-controls";
+import { FriendLibraryBrowser } from "@/features/social/components/friend-library-browser";
+import { fromLibraryEntry } from "@/features/social/friend-title-item";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ROUTES } from "@/constants/routes";
-import { mediaHref } from "@/lib/media/routes";
-import { WATCH_STATUS_LABELS } from "@/types/library";
+import { backdropUrl } from "@/lib/media/image";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -34,43 +35,107 @@ export default async function UserProfilePage({ params }: PageProps) {
   const library = await getFriendLibrary(user.id, username);
   const name = profile.display_name || profile.username || "Unknown";
 
-  const grouped = new Map<string, typeof library extends null ? never : NonNullable<typeof library>["entries"]>();
-  for (const entry of library?.entries ?? []) {
-    const list = grouped.get(entry.status) ?? [];
-    list.push(entry);
-    grouped.set(entry.status, list);
+  const entries = library?.entries ?? [];
+  const items = entries.map(fromLibraryEntry);
+
+  // The most recently watched title with artwork becomes the header backdrop —
+  // it makes the page feel like this person's shelf rather than a generic
+  // profile, and costs nothing extra since the rows are already loaded.
+  const heroBackdrop =
+    entries.find((entry) => entry.backdrop_path)?.backdrop_path ?? null;
+  const heroUrl = backdropUrl(heroBackdrop, "w1280");
+
+  const films = items.filter((item) => item.mediaType === "movie").length;
+  const series = items.length - films;
+  const finished = items.filter((item) => item.status === "completed").length;
+
+  const stats: { label: string; value: string }[] = [];
+  if (items.length > 0) {
+    stats.push({ label: "Tracked", value: String(items.length) });
+    if (films > 0) stats.push({ label: "Films", value: String(films) });
+    if (series > 0) stats.push({ label: "Series", value: String(series) });
+    if (finished > 0) stats.push({ label: "Finished", value: String(finished) });
   }
 
   return (
     <div className="animate-fade-up space-y-8">
-      <header className="flex flex-wrap items-start gap-4">
-        <Avatar className="h-16 w-16 shrink-0">
-          {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
-          <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-
-        <div className="min-w-0 flex-1 space-y-1">
-          <h1 className="text-page-title min-w-0 truncate">{name}</h1>
-          {profile.username ? (
-            <p className="text-muted-foreground text-sm">@{profile.username}</p>
-          ) : null}
-          {profile.bio ? (
-            <p className="text-muted-foreground max-w-prose text-sm text-pretty">
-              {profile.bio}
-            </p>
-          ) : null}
-          {relationship === "friends" ? (
-            <Badge variant="muted">Friends</Badge>
-          ) : null}
-        </div>
-
-        <div className="flex shrink-0 items-center gap-1.5">
-          <ProfileFriendAction
-            targetUserId={profile.id}
-            friendshipId={friendshipId}
-            relationship={relationship}
-            name={name}
+      <header className="relative overflow-hidden rounded-2xl">
+        {heroUrl ? (
+          <>
+            <Image
+              src={heroUrl}
+              alt=""
+              fill
+              sizes="100vw"
+              priority
+              className="scale-105 object-cover opacity-35 blur-[1px]"
+            />
+            {/* Two scrims: vertical for text legibility, horizontal to keep the
+                artwork readable as an image rather than a wash of colour. */}
+            <div
+              className="from-background via-background/85 absolute inset-0 bg-gradient-to-t to-transparent"
+              aria-hidden
+            />
+            <div
+              className="from-background/95 absolute inset-0 bg-gradient-to-r to-transparent"
+              aria-hidden
+            />
+          </>
+        ) : (
+          <div
+            className="bg-muted/40 absolute inset-0 dark:bg-white/[0.04]"
+            aria-hidden
           />
+        )}
+
+        <div className="relative flex flex-wrap items-start gap-4 p-5 sm:p-7">
+          <Avatar className="ring-background h-16 w-16 shrink-0 ring-2 sm:h-20 sm:w-20">
+            {profile.avatar_url ? <AvatarImage src={profile.avatar_url} alt="" /> : null}
+            <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="space-y-1">
+              <h1 className="text-page-title min-w-0 truncate">{name}</h1>
+              {profile.username ? (
+                <p className="text-muted-foreground font-mono text-xs">
+                  @{profile.username}
+                </p>
+              ) : null}
+            </div>
+
+            {profile.bio ? (
+              <p className="text-muted-foreground max-w-prose text-sm text-pretty">
+                {profile.bio}
+              </p>
+            ) : null}
+
+            {relationship === "friends" ? <Badge variant="muted">Friends</Badge> : null}
+
+            {stats.length > 0 ? (
+              <dl className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex items-baseline gap-1.5">
+                    <dd className="font-display text-lg leading-none font-semibold tabular-nums">
+                      {stat.value}
+                    </dd>
+                    <dt className="text-muted-foreground font-mono text-[10px] tracking-[0.14em] uppercase">
+                      {stat.label}
+                    </dt>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <ProfileFriendAction
+              targetUserId={profile.id}
+              friendshipId={friendshipId}
+              relationship={relationship}
+              name={name}
+            />
+          </div>
         </div>
       </header>
 
@@ -84,50 +149,14 @@ export default async function UserProfilePage({ params }: PageProps) {
               : `Add ${name} as a friend to see what they're watching.`
           }
         />
-      ) : (library?.entries.length ?? 0) === 0 ? (
+      ) : items.length === 0 ? (
         <EmptyState
-          icon={Lock}
+          icon={Sparkles}
           title="Nothing here yet"
           description={`${name} hasn't tracked any titles.`}
         />
       ) : (
-        <div className="space-y-8">
-          {[...grouped.entries()].map(([status, entries]) => (
-            <section key={status} className="space-y-3">
-              <h2 className="text-section-title">
-                {WATCH_STATUS_LABELS[status as keyof typeof WATCH_STATUS_LABELS] ?? status}{" "}
-                <Badge variant="muted">{entries.length}</Badge>
-              </h2>
-              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {entries.map((entry) => (
-                  <li
-                    key={entry.id}
-                    className="min-w-0 rounded-xl bg-muted/40 p-3 dark:bg-white/[0.05]"
-                  >
-                    <Link
-                      href={mediaHref(
-                        entry.media_type as "movie" | "tv",
-                        entry.external_id,
-                      )}
-                      className="block min-w-0 truncate text-sm font-medium underline-offset-4 hover:underline"
-                    >
-                      {entry.title}
-                    </Link>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {entry.media_type === "tv" && entry.current_season != null
-                        ? `S${entry.current_season}E${entry.current_episode ?? "—"} · `
-                        : ""}
-                      {entry.user_rating != null ? `★ ${entry.user_rating}` : null}
-                      {entry.user_rating == null && entry.progress_percent > 0
-                        ? `${Math.round(entry.progress_percent)}%`
-                        : null}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+        <FriendLibraryBrowser items={items} name={name} />
       )}
     </div>
   );

@@ -137,6 +137,7 @@ function toActivityItem(entry: LibraryEntry): FriendActivityItem {
     currentEpisode: entry.current_episode,
     lastWatchedAt: entry.last_watched_at,
     userRating: entry.user_rating,
+    ratingScale: entry.rating_scale,
   };
 }
 
@@ -180,11 +181,16 @@ export async function getFriendActivity(
  *
  * `visible` is derived from the owner's setting and the friendship, not from
  * whether rows came back, so "hidden" and "empty" stay distinguishable.
+ *
+ * The cap is generous because the profile page is a browse surface, not a
+ * preview: an active user can easily pass a hundred completed titles in one
+ * status alone, and a low cap silently hides whole shelves. Still bounded — one
+ * indexed read, ordered so the most recent activity survives any truncation.
  */
 export async function getFriendLibrary(
   viewerId: string,
   username: string,
-  limit = 120,
+  limit = 400,
 ): Promise<FriendLibrary | null> {
   const profile = await getProfileByUsername(username);
   if (!profile) return null;
