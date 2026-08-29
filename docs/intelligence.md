@@ -17,6 +17,10 @@ Phase 4 computes personal statistics, insights, recommendations, Decision Scores
 | Wrapped / recap | `src/lib/intelligence/wrapped.ts` |
 | Dashboard assembly | `src/lib/intelligence/dashboard.ts` |
 
+> `recommendations.ts` here is the dashboard's lightweight genre/popularity rail.
+> The personalized recommendation engine behind `/recommendations` is a separate
+> subsystem in `src/lib/recommendations/` — see [recommendations.md](./recommendations.md).
+
 ## Routes
 
 | Path | Purpose |

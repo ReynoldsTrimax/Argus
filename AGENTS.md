@@ -60,6 +60,19 @@ npm run validate
 - UI: `src/features/intelligence/components/*`
 - Docs: `docs/intelligence.md`
 
+## Recommendations
+
+Separate subsystem from the intelligence layer. Deterministic, no AI, no new tables.
+
+- Types: `src/types/recommendations.ts`
+- Engine: `src/lib/recommendations/*` (pure layers + `tmdb-catalog.ts` adapter)
+- Entry point: `getRecommendationsForCurrentUser()` in `src/lib/recommendations/service.ts`
+- UI: `src/features/recommendations/components/*`, route `/recommendations`
+- Docs: `docs/recommendations.md`
+
+`src/lib/intelligence/recommendations.ts` and `decision-score.ts` are a different,
+still-live feature (dashboard rail + detail-page score). Do not merge them.
+
 ## Database
 
 Apply migrations in order under `database/migrations/` (001 → 002 → 003).

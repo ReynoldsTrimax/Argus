@@ -14,6 +14,7 @@ import {
   Lightbulb,
   Settings,
   Sparkles,
+  Target,
   Tv,
   User,
   Users,
@@ -42,6 +43,12 @@ export const MAIN_NAV: readonly NavItem[] = [
     href: ROUTES.discover,
     icon: Compass,
     description: "Explore entertainment",
+  },
+  {
+    title: "For You",
+    href: ROUTES.recommendations,
+    icon: Target,
+    description: "Personalized recommendations",
   },
   {
     title: "Library",
