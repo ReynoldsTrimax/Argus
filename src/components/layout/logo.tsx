@@ -12,11 +12,6 @@ interface LogoProps {
   className?: string;
   /** Kept for API compatibility — the wordmark *is* the mark. */
   showWordmark?: boolean;
-  /**
-   * Trailing vertical hairline, as on the product panel header.
-   * Use when the logo sits directly beside other chrome.
-   */
-  divider?: boolean;
 }
 
 /** "ARGUS" → "A R G U S" — a literal single space between each letter. */
@@ -26,13 +21,9 @@ const SPACED_NAME = APP_NAME.toUpperCase().split("").join(" ");
  * Argus wordmark — set in Bostone, one letter at a time with a single space
  * between each. This is the only place Bostone is used in the app.
  */
-export function Logo({
-  href = ROUTES.home,
-  className,
-  divider = false,
-}: LogoProps) {
+export function Logo({ href = ROUTES.home, className }: LogoProps) {
   return (
-    <span className={cn("inline-flex items-center gap-3.5", className)}>
+    <span className={cn("inline-flex items-center", className)}>
       <Link
         href={href}
         className="group relative inline-flex items-center outline-none"
@@ -44,7 +35,7 @@ export function Logo({
             // Larger and set tighter: as a wordmark grows, the single spaces
             // between letters read as gaps, so negative tracking pulls it back
             // into one mark instead of five letters.
-            "relative text-[1.5rem] leading-none tracking-[-0.015em] text-foreground",
+            "relative text-[1.75rem] leading-none tracking-[-0.02em] text-foreground",
           )}
         >
           {SPACED_NAME}
@@ -60,10 +51,6 @@ export function Logo({
           />
         </span>
       </Link>
-
-      {divider ? (
-        <span className="h-3.5 w-px bg-border dark:bg-white/12" aria-hidden="true" />
-      ) : null}
     </span>
   );
 }

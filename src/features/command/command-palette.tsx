@@ -126,7 +126,6 @@ export function CommandPalette() {
       onOpenChange={handleOpenChange}
       hideTrigger
       bindShortcut={false}
-      showThemeGroup={false}
       shouldFilter={false}
       placeholder="Search movies, shows, people, genres…"
       inputValue={query}

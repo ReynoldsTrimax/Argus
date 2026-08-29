@@ -1,17 +1,14 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 /**
- * Toast notifications via Sonner, theme-aware.
+ * Toast notifications via Sonner. Argus is dark-only, so the theme is fixed.
  */
 function Toaster({ ...props }: ToasterProps) {
-  const { theme = "system" } = useTheme();
-
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme="dark"
       className="toaster group"
       toastOptions={{
         classNames: {

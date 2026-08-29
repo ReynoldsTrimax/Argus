@@ -85,14 +85,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f6f8" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  colorScheme: "light dark",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -103,17 +100,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sourceSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${sourceSans.variable} ${geistMono.variable} h-full antialiased`}
+      style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
-      <head>
-        {/* System theme only — no manual override, match OS before paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{localStorage.removeItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
-          }}
-        />
-      </head>
       <body className="bg-background text-foreground min-h-dvh font-sans">
         <SkipLink />
         <AppProviders>

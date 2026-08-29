@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { Moon, Sun, Monitor, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import {
   CommandDialog,
@@ -57,8 +56,6 @@ export interface CommandMenuProps {
   open?: boolean;
   /** Controlled open change handler */
   onOpenChange?: (open: boolean) => void;
-  /** Whether to include the built-in Theme group */
-  showThemeGroup?: boolean;
   /** Placeholder text inside the search input */
   placeholder?: string;
   /** Controlled input value (for external search) */
@@ -136,7 +133,6 @@ function CommandMenu({
   children,
   open: openProp,
   onOpenChange,
-  showThemeGroup = true,
   placeholder = "Search components, pages, actions…",
   inputValue,
   onInputValueChange,
@@ -149,7 +145,6 @@ function CommandMenu({
   className,
 }: CommandMenuProps) {
   const router = useRouter();
-  const { setTheme } = useTheme();
 
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
   const isControlled = openProp !== undefined;
@@ -226,35 +221,6 @@ function CommandMenu({
           </CommandGroup>
         </React.Fragment>
       ))}
-
-      {showThemeGroup && (
-        <>
-          {groups.length > 0 && <CommandSeparator />}
-          <CommandGroup heading="Theme">
-            <CommandItem
-              keywords={["light", "bright", "white", "day"]}
-              onSelect={() => run(() => setTheme("light"))}
-            >
-              <Sun className="mr-2 size-4" />
-              Light Mode
-            </CommandItem>
-            <CommandItem
-              keywords={["dark", "night", "black"]}
-              onSelect={() => run(() => setTheme("dark"))}
-            >
-              <Moon className="mr-2 size-4" />
-              Dark Mode
-            </CommandItem>
-            <CommandItem
-              keywords={["system", "auto", "os", "default"]}
-              onSelect={() => run(() => setTheme("system"))}
-            >
-              <Monitor className="mr-2 size-4" />
-              System Theme
-            </CommandItem>
-          </CommandGroup>
-        </>
-      )}
     </>
   );
 

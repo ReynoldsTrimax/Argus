@@ -50,7 +50,7 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-9 w-9 rounded-xl p-0"
+          className="relative h-9 w-9 rounded-full p-0"
           aria-label="Open user menu"
         >
           <Avatar className="h-9 w-9">

@@ -28,7 +28,7 @@ Frame is a premium personal entertainment tracking web application — a central
 - **Authentication** — Google, GitHub, and email/password via Supabase Auth
 - **Secure sessions** — cookie-based SSR clients, proxy protection, OAuth callback
 - **Profiles & settings** — auto-provisioned on signup
-- **Design system & theming** — OLED dark / light / system, zero-flash
+- **Design system & theming** — OLED dark only (no light mode), zero-flash
 - **App shell** — collapsible sidebar, responsive nav, user menu
 
 ### Phase 2 — Catalog

@@ -11,84 +11,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------------------
-   Light — clean solid daylight
+   Structural tokens — shared by every surface (no colour here)
+
+   Argus is dark-only: there is no light theme. Colour tokens live in the
+   `:root, .dark` block below, which is always in effect.
 --------------------------------------------------------------------------- */
 :root {
-  --background: 220 20% 97%;
-  --foreground: 222 28% 10%;
-
-  --card: 0 0% 100%;
-  --card-solid: 0 0% 100%;
-  --card-foreground: 222 28% 10%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 28% 10%;
-
-  --primary: 212 88% 48%;
-  --primary-foreground: 0 0% 100%;
-  /* Same blue family as primary, stepped down for selected nav (not a foreign navy). */
-  --nav-active: 212 82% 40%;
-  --nav-active-foreground: 0 0% 100%;
-
-  --secondary: 220 16% 94%;
-  --secondary-foreground: 222 22% 22%;
-
-  --muted: 220 14% 94%;
-  --muted-foreground: 220 10% 40%;
-
-  --accent: 214 24% 95%;
-  --accent-foreground: 222 26% 16%;
-
-  --destructive: 0 72% 50%;
-  --destructive-foreground: 0 0% 100%;
-
-  --success: 160 50% 34%;
-  --success-foreground: 0 0% 100%;
-
-  --warning: 32 90% 46%;
-  --warning-foreground: 222 28% 10%;
-
-  --border: 220 14% 88%;
-  --input: 220 14% 88%;
-  --ring: 212 88% 48%;
-
-  --chart-1: 212 88% 48%;
-  --chart-2: 190 65% 42%;
-  --chart-3: 250 50% 56%;
-  --chart-4: 160 45% 40%;
-  --chart-5: 340 55% 52%;
-
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 222 22% 18%;
-  --sidebar-border: 220 14% 90%;
-  --sidebar-accent: 214 32% 95%;
-  --sidebar-accent-foreground: 222 30% 12%;
-  --sidebar-ring: 212 88% 48%;
-
-  /* Surface aliases (kept for class names — now solid) */
-  --surface: 0 0% 100%;
-  --surface-2: 220 18% 97%;
-  --surface-3: 220 16% 95%;
-  --surface-border: 220 14% 88%;
-  --surface-border-strong: 220 14% 82%;
-
-  --shadow-xs: 0 1px 2px rgb(20 40 80 / 0.04);
-  --shadow-sm: 0 1px 3px rgb(20 40 80 / 0.06), 0 1px 2px rgb(20 40 80 / 0.04);
-  --shadow-md: 0 4px 16px -4px rgb(20 40 80 / 0.1), 0 2px 6px -2px rgb(20 40 80 / 0.05);
-  --shadow-lg:
-    0 12px 32px -8px rgb(20 40 80 / 0.12), 0 4px 12px -4px rgb(20 40 80 / 0.06);
-  --shadow-xl: 0 24px 48px -12px rgb(15 30 60 / 0.14);
-  --shadow-glow:
-    0 0 0 1px hsl(212 88% 48% / 0.15), 0 8px 24px -8px hsl(212 88% 48% / 0.25);
-  --shadow-glow-soft: 0 8px 28px -10px hsl(212 88% 48% / 0.2);
-  --shadow-float: 0 12px 40px -12px rgb(15 30 60 / 0.12);
-
-  /* Soft product elevation (not clay dual-extrusion) */
-  --shadow-clay: var(--shadow-md);
-  --shadow-clay-sm: var(--shadow-sm);
-  --shadow-clay-lg: var(--shadow-lg);
-  --shadow-clay-press: inset 0 1px 2px rgb(20 40 80 / 0.08);
-
   /*
    * Radii — boxy by design. The landing page's instrument-panel language
    * (hairline borders, razor corners) is the product language too, so the
@@ -126,8 +54,12 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Dark — pitch black canvas + blue accent only
+   Colour — pitch black canvas + blue accent only.
+
+   Applied to `:root` as well as `.dark` so the app is dark even before the
+   class lands (and for any subtree that never gets it). Light mode is gone.
 --------------------------------------------------------------------------- */
+:root,
 .dark {
   /* True black stage */
   --background: 0 0% 0%;
@@ -502,10 +434,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  html {
-    color-scheme: light;
-  }
-
+  html,
   html.dark {
     color-scheme: dark;
   }

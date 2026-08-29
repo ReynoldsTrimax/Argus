@@ -21,9 +21,9 @@ export function AppHeader({ user }: AppHeaderProps) {
         <MobileNav />
       </div>
 
-      {/* Logo + hairline divider, matching the product panel header */}
+      {/* Wordmark only — no trailing hairline divider */}
       <div className="hidden min-w-0 md:block">
-        <Logo href={ROUTES.dashboard} divider />
+        <Logo href={ROUTES.dashboard} />
       </div>
 
       <div className="min-w-0 flex-1" aria-hidden />

@@ -4,8 +4,10 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 /**
- * Theme follows the OS only (prefers-color-scheme).
- * No in-app light/dark toggle — change mode in system settings.
+ * Argus is dark-only. The theme is force-pinned to `dark`, so there is no
+ * light mode, no system following, and no persisted preference.
+ * `next-themes` stays in the tree purely so `useTheme()` consumers
+ * (e.g. Sonner) resolve to a real value.
  */
 export function ThemeProvider({
   children,
@@ -14,9 +16,10 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
-      // Resolve system → light|dark; no forcedTheme so OS can switch live.
+      defaultTheme="dark"
+      forcedTheme="dark"
+      enableSystem={false}
+      enableColorScheme={false}
       disableTransitionOnChange
       {...props}
     >
