@@ -35,6 +35,7 @@ export const ROUTES = {
   // Intelligence (Phase 4)
   stats: "/stats",
   insights: "/insights",
+  recommendations: "/recommendations",
   calendar: "/calendar",
   timeline: "/timeline",
   wrapped: (year?: number) =>
@@ -65,6 +66,7 @@ export const PROTECTED_ROUTES: readonly string[] = [
   "/u",
   ROUTES.stats,
   ROUTES.insights,
+  ROUTES.recommendations,
   ROUTES.calendar,
   ROUTES.timeline,
   "/wrapped",
