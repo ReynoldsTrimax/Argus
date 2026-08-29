@@ -6,7 +6,7 @@
  * these hand-written types are the source of truth for app code.
  */
 
-import type { LibraryEntry, WatchStatus } from "./library";
+import type { LibraryEntry, RatingScale, WatchStatus } from "./library";
 
 export type FriendshipStatus = "pending" | "accepted" | "declined";
 
@@ -45,12 +45,7 @@ export interface PublicProfile {
  * available action differs entirely: one is answered, the other is cancelled.
  */
 export type RelationshipState =
-  | "self"
-  | "none"
-  | "friends"
-  | "incoming_pending"
-  | "outgoing_pending"
-  | "declined";
+  "self" | "none" | "friends" | "incoming_pending" | "outgoing_pending" | "declined";
 
 /** A profile plus the viewer's relationship to it, for search results. */
 export interface ProfileWithRelationship {
@@ -92,6 +87,11 @@ export interface FriendActivityItem {
   currentEpisode: number | null;
   lastWatchedAt: string | null;
   userRating: number | null;
+  /**
+   * Scale the rating was entered on. Carried alongside the value because each
+   * user picks their own — a bare `4` cannot be rendered without it.
+   */
+  ratingScale: RatingScale | null;
 }
 
 /** A friend's full library page payload. */
