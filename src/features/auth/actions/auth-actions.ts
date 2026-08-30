@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isAuthCircuitOpen, isTimeoutError } from "@/lib/supabase/fetch";
 import { loginSchema, signupSchema } from "@/lib/validations/auth";
+import { safeNextPath } from "@/lib/utils/safe-redirect";
 import { ROUTES } from "@/constants/routes";
 import type { ActionResult, OAuthProvider } from "@/types";
 
@@ -123,9 +124,11 @@ export async function signInWithPassword(
     return { success: false, error: error.message };
   }
 
-  const next = (formData.get("next") as string) || ROUTES.dashboard;
+  const next = formData.get("next");
   revalidatePath("/", "layout");
-  redirect(next.startsWith("/") ? next : ROUTES.dashboard);
+  // `next` arrives from a query parameter on the sign-in link, so it is
+  // attacker-controlled; sanitise before it becomes a Location header.
+  redirect(safeNextPath(typeof next === "string" ? next : null, ROUTES.dashboard));
 }
 
 /**

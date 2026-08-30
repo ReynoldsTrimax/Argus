@@ -2,11 +2,29 @@ import { NextResponse } from "next/server";
 
 import { getMediaProvider } from "@/lib/media/providers";
 import { isCatalogConfigured } from "@/lib/media/catalog";
+import {
+  RATE_LIMITS,
+  checkRateLimit,
+  rateLimitedResponse,
+  requireApiUser,
+} from "@/lib/api/guard";
 
 /**
- * Trending titles for command palette empty state.
+ * Trending titles for the command palette empty state.
+ * Session-gated for the same reason as search: it spends TMDB quota.
  */
 export async function GET() {
+  const auth = await requireApiUser();
+  if (!auth.ok) return auth.response;
+
+  const limit = checkRateLimit(
+    "trending",
+    auth.userId,
+    RATE_LIMITS.trending.limit,
+    RATE_LIMITS.trending.windowMs,
+  );
+  if (!limit.ok) return rateLimitedResponse(limit.retryAfterSeconds);
+
   if (!isCatalogConfigured()) {
     return NextResponse.json({ results: [] }, { status: 503 });
   }
@@ -27,12 +45,12 @@ export async function GET() {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+          "Cache-Control": "private, max-age=300",
         },
       },
     );
   } catch (error) {
     console.error("[api/media/trending]", error);
-    return NextResponse.json({ results: [] }, { status: 500 });
+    return NextResponse.json({ results: [] }, { status: 502 });
   }
 }

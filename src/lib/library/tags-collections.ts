@@ -36,6 +36,17 @@ export async function assignTag(
   tagId: string,
 ): Promise<void> {
   const supabase = await createClient();
+
+  // Same unchecked-foreign-key shape as addToCollection: RLS validates the new
+  // row's `user_id`, not that `tag_id` belongs to the caller, so verify the
+  // parent tag first rather than relying on tag ids being unguessable.
+  const { data: ownedTag } = await table(supabase, "tags")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("id", tagId)
+    .maybeSingle();
+  if (!ownedTag) throw new Error("Tag not found");
+
   const { error } = await table(supabase, "tag_assignments").upsert(
     { user_id: userId, entry_id: entryId, tag_id: tagId },
     { onConflict: "tag_id,entry_id" },
@@ -172,6 +183,18 @@ export async function addToCollection(
   position?: number,
 ): Promise<void> {
   const supabase = await createClient();
+
+  // The parent collection must belong to the caller.
+  //
+  // RLS on `collection_items` only checks that the *new row's* `user_id` is the
+  // caller, which it always is — so without this guard a caller could insert an
+  // item pointing at someone else's `collection_id` and the row would be
+  // accepted. The count trigger on that table runs as SECURITY DEFINER and
+  // would then bump the victim's `collections.item_count`. Migration 005 makes
+  // collection ids readable to accepted friends, so the id is not a secret.
+  const owned = await getCollection(userId, collectionId);
+  if (!owned) throw new Error("Collection not found");
+
   const { data: maxPos } = await table(supabase, "collection_items")
     .select("position")
     .eq("collection_id", collectionId)
