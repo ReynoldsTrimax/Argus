@@ -19,6 +19,7 @@ import type {
 import { getMediaProvider } from "@/lib/media/providers";
 import { isTmdbConfigured } from "@/lib/media/providers/tmdb/client";
 import { enrichRatings } from "@/lib/media/ratings";
+import { CREDIBILITY_VOTE_FLOOR } from "@/lib/media/filters";
 
 export function isCatalogConfigured(): boolean {
   return isTmdbConfigured();
@@ -291,7 +292,14 @@ export async function getGenrePage(
 
   const [popular, topRated, newest] = await Promise.all([
     discover({ ...base, sortBy: "popularity.desc" }),
-    discover({ ...base, sortBy: "vote_average.desc", voteAverageGte: 7 }),
+    // Same credibility floor the browse pages use — without it this rail fills
+    // with one-vote 10.0 titles rather than the genre's actual best.
+    discover({
+      ...base,
+      sortBy: "vote_average.desc",
+      voteAverageGte: 7,
+      voteCountGte: CREDIBILITY_VOTE_FLOOR.filtered[mediaType],
+    }),
     discover({ ...base, sortBy: "release_date.desc" }),
   ]);
 

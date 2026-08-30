@@ -347,6 +347,15 @@ export interface MediaDiscoverFilters {
   runtimeLte?: number;
   voteAverageGte?: number;
   voteAverageLte?: number;
+  /**
+   * Minimum number of audience votes.
+   *
+   * Required for any rating-based sort to mean anything: `vote_average.desc`
+   * without a vote floor returns titles sitting at 10.0 from a single vote, so
+   * the highest-rated page fills with obscurities instead of the films people
+   * actually rate highly.
+   */
+  voteCountGte?: number;
   sortBy?: MediaSortBy;
   page?: number;
   /** Streaming provider id — provider-ready; may be ignored until integrated. */
