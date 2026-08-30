@@ -17,7 +17,7 @@ export function generateInsights(
     insights.push({
       id: "hours-total",
       title: "Time invested",
-      body: `You've logged about ${formatWatchHours(totals.totalWatchMinutes)} of entertainment.`,
+      body: `You've logged about ${formatWatchHours(totals.totalWatchMinutes)} of watch time.`,
       severity: "positive",
       category: "time",
     });
@@ -35,7 +35,7 @@ export function generateInsights(
     insights.push({
       id: "streak-best",
       title: "Your best streak",
-      body: `Your longest watch streak is ${streaks.longest} days. One session today restarts the fire.`,
+      body: `Your longest watch streak is ${streaks.longest} days. One session today starts a new one.`,
       severity: "neutral",
       category: "streak",
     });
@@ -46,7 +46,7 @@ export function generateInsights(
     insights.push({
       id: "genre-fav",
       title: "Taste signal",
-      body: `${topGenre.name} leads your library with ${topGenre.count} titles — your clearest genre affinity.`,
+      body: `${topGenre.name} leads your library with ${topGenre.count} titles, your clearest genre affinity.`,
       severity: "info",
       category: "taste",
     });
@@ -92,7 +92,7 @@ export function generateInsights(
     insights.push({
       id: "drop-rate",
       title: "Selective tastes",
-      body: `${rates.droppedSeriesPercent}% of your shows are dropped — you don't force mediocre TV.`,
+      body: `${rates.droppedSeriesPercent}% of your shows are dropped. You don't force mediocre TV.`,
       severity: "neutral",
       category: "completion",
     });
@@ -155,7 +155,7 @@ export function generateInsights(
     insights.push({
       id: "rewatch",
       title: "Comfort rewatches",
-      body: `You've logged ${totals.rewatchCount} rewatch${totals.rewatchCount === 1 ? "" : "es"} — comfort cinema is part of your rhythm.`,
+      body: `You've logged ${totals.rewatchCount} rewatch${totals.rewatchCount === 1 ? "" : "es"}, so comfort viewing is part of your rhythm.`,
       severity: "info",
       category: "habits",
     });
@@ -165,7 +165,7 @@ export function generateInsights(
     insights.push({
       id: "empty",
       title: "Start your journal",
-      body: "Watch, rate, and review a few titles — insights appear as your library grows.",
+      body: "Rate and review a few titles, and insights will show up here.",
       severity: "neutral",
       category: "habits",
     });

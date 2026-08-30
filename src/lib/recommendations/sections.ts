@@ -350,7 +350,7 @@ export function assembleColdStartSections(
     id: "cold-trending",
     kind: "cold_start",
     title: "Trending now",
-    reason: "Not personalized — Argus has nothing to learn from yet.",
+    reason: "Popular in the catalog right now, not based on your library.",
     items: diversify(trending, {
       limit: SECTIONS.coldStart,
       relevanceWeight: DIVERSITY.relevanceWeight,

@@ -40,7 +40,7 @@ export default async function StatsPage() {
             Statistics
           </h1>
           <p className="text-sm text-muted-foreground">
-            Live from your library — computed just now.
+            Computed from your library just now.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

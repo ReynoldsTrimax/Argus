@@ -55,8 +55,7 @@ export function FinalCtaSection() {
           style={{ animationDelay: "420ms" }}
         >
           <p className="landing-lead">
-            One account, one library, one clear picture of everything you have watched and
-            everything you still want to.
+            One library for everything you have watched, and everything you still mean to.
           </p>
         </div>
 

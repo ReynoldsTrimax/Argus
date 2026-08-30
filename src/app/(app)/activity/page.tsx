@@ -23,7 +23,7 @@ export default async function ActivityPage() {
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Activity</h1>
         <p className="text-sm text-muted-foreground">
-          A private feed of what you&apos;ve done in Argus — foundation for future insights.
+          A private log of what you&apos;ve done in Argus.
         </p>
       </header>
 

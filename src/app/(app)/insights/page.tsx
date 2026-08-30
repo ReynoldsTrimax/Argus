@@ -24,7 +24,7 @@ export default async function InsightsPage() {
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Insights</h1>
         <p className="text-sm text-muted-foreground">
-          Deterministic observations from your watch history — no AI.
+          Everything here comes from your own watch history.
         </p>
       </header>
       <InsightCards insights={insights} />

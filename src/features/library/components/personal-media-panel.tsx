@@ -319,7 +319,7 @@ export function PersonalMediaPanel({
           >
             <p className="text-foreground text-[11px] leading-relaxed">
               Remove <span className="font-medium">{identity.title}</span> and
-              everything saved with it — your rating, review, notes and episode
+              everything saved with it: your rating, review, notes and episode
               progress? This can&apos;t be undone.
             </p>
             <div className="flex gap-2">
@@ -774,7 +774,7 @@ function StatusToggle({
       size="sm"
       variant={active ? "default" : "outline"}
       aria-pressed={active}
-      aria-label={active ? `${label} — press again to remove from library` : label}
+      aria-label={active ? `${label}. Press again to remove from library` : label}
       title={active ? "Press again to remove from library" : undefined}
       className={cn(
         "h-8 justify-center gap-1.5 text-xs transition-transform duration-100 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",

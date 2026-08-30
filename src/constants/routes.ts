@@ -10,6 +10,9 @@ export const ROUTES = {
   profile: "/profile",
   offline: "/offline",
   authCallback: "/auth/callback",
+  // Legal
+  terms: "/terms",
+  privacy: "/privacy",
   // Catalog
   discover: "/discover",
   movies: "/movies",

@@ -79,7 +79,7 @@ export function RecommendationCard({
         href={href}
         prefetch={false}
         className="focus-visible:ring-ring block rounded-xl focus-visible:ring-2 focus-visible:outline-none"
-        aria-label={`${item.media.title}${year ? `, ${year}` : ""} — ${item.explanation.headline}`}
+        aria-label={`${item.media.title}${year ? `, ${year}` : ""}. ${item.explanation.headline}`}
       >
         <div
           className={cn(

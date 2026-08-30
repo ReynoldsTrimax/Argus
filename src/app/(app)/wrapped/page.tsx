@@ -42,7 +42,7 @@ export default async function WrappedPage({ searchParams }: PageProps) {
             {year}
           </h1>
           <p className="max-w-lg text-sm text-muted-foreground text-pretty">
-            Your personal entertainment Wrapped — hours, favorites, and streaks.
+            Your year in hours, favorites and streaks.
           </p>
           <div className="flex flex-wrap gap-2 pt-2">
             <Button asChild variant="outline" size="sm">
@@ -119,8 +119,7 @@ export default async function WrappedPage({ searchParams }: PageProps) {
       ) : null}
 
       <p className="text-center text-xs text-muted-foreground">
-        Biggest month: {report.biggestMonth ?? "—"} · Share-ready layout for your eyes only
-        (social export comes later).
+        Biggest month: {report.biggestMonth ?? "—"} · Private to you.
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ const PRINCIPLES = [
   {
     key: "Status",
     title: "Six states, not two",
-    body: "Watching, completed, paused, dropped, wishlist, rewatching — because “watched / not watched” was never the truth.",
+    body: "Watching, completed, paused, dropped, wishlist, rewatching. Because “watched / not watched” was never the truth.",
   },
   {
     key: "Progress",
@@ -29,7 +29,7 @@ export function PremiseSection() {
     >
       <SectionHeader
         title="Nothing you watch should ever go missing."
-        lead="Discovery lives in one app, progress in another, opinions nowhere at all. Argus collapses that into a single system with a memory — so the series you meant to finish never quietly disappears."
+        lead="Discovery lives in one app, progress in another, opinions nowhere at all. Argus keeps all three together, so the series you meant to finish never quietly disappears."
       />
 
       <div className="mt-14 grid gap-x-10 gap-y-12 sm:mt-16 sm:grid-cols-3">

@@ -39,7 +39,7 @@ export default async function WatchlistPage() {
         <div className="space-y-1">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Watchlist</h1>
           <p className="text-sm text-muted-foreground">
-            Plan to watch and wishlist titles — pin favorites from any detail page.
+            Everything you plan to watch. Pin titles from any detail page.
           </p>
         </div>
         {random ? (

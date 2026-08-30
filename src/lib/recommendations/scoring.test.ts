@@ -449,7 +449,7 @@ describe("explain", () => {
 
     const explanation = explain(scored, profile);
     // The anchor qualified through a 10/10 rating, so the wording must say so.
-    expect(explanation.headline).toBe("Because you rated highly Blade Runner 2049");
+    expect(explanation.headline).toBe("Because you rated Blade Runner 2049 highly");
   });
 
   it("names the genres it actually matched", () => {

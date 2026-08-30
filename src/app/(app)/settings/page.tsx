@@ -104,6 +104,12 @@ export default async function SettingsPage() {
             <Button asChild variant="outline" size="sm">
               <Link href={ROUTES.profile}>Edit profile</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={ROUTES.privacy}>Privacy Policy</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={ROUTES.terms}>Terms of Service</Link>
+            </Button>
           </div>
           <p className="text-xs text-muted-foreground">
             Full JSON export via{" "}

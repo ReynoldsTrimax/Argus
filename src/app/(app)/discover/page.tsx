@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Discover",
-  description: "Explore trending movies, TV shows, and more on Argus",
+  description: "Browse trending movies and TV shows on Argus",
 };
 
 export const revalidate = 900;
@@ -34,7 +34,7 @@ export default async function DiscoverPage() {
     <div className="space-y-10">
       <PageHeaderMotion
         title="Discover"
-        description="A cinematic catalog of movies and television — search with ⌘K anytime."
+        description="Movies and television, all searchable. Press ⌘K from anywhere."
       />
 
       {!data.configured ? <CatalogConfigBanner /> : null}

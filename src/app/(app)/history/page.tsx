@@ -28,7 +28,7 @@ export default async function HistoryPage() {
           Watch history
         </h1>
         <p className="text-sm text-muted-foreground">
-          Every session you&apos;ve logged — ready for future calendar and analytics views.
+          Every session you&apos;ve logged.
         </p>
       </header>
 

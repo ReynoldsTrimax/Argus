@@ -97,7 +97,7 @@ export async function markEpisodeWatched(
 
   await logActivity(supabase, userId, {
     activityType: "episode_watched",
-    summary: `Watched S${seasonNumber}E${episodeNumber}${meta?.episodeName ? ` — ${meta.episodeName}` : ""} of ${entry?.title ?? "show"}`,
+    summary: `Watched S${seasonNumber}E${episodeNumber} of ${entry?.title ?? "show"}${meta?.episodeName ? `: ${meta.episodeName}` : ""}`,
     entryId,
     title: entry?.title,
     metadata: { seasonNumber, episodeNumber },

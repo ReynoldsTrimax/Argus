@@ -21,7 +21,7 @@ export default function LoginPage() {
     <Card className="shadow-md">
       <CardHeader className="space-y-1">
         <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to continue to your entertainment hub.</CardDescription>
+        <CardDescription>Sign in to get back to your library.</CardDescription>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<AuthFormSkeleton />}>

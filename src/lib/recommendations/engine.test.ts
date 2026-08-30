@@ -580,13 +580,14 @@ describe("runRecommendationEngine — sparse and empty", () => {
 
     expect(run.mode).toBe("cold_start");
     expect(run.profile.signalStrength).toBe("empty");
-    expect(run.notice).toContain("no viewing history");
+    // The notice must say the picks are not personal; the exact wording is copy.
+    expect(run.notice).toContain("general picks");
     expect(run.sections.every((s) => s.kind === "cold_start")).toBe(true);
     expect(allItems(run).length).toBeGreaterThan(0);
 
     // It must not claim to know the user.
     const text = run.sections.map((s) => s.reason).join(" ");
-    expect(text).toContain("Not personalized");
+    expect(text).toContain("not based on your library");
   });
 
   it("still personalizes a one-title library, with low confidence", async () => {

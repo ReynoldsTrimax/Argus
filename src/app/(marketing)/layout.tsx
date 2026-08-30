@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 import { MarketingHeader } from "@/components/layout/marketing-header";
 import { APP_NAME } from "@/constants/app";
+import { ROUTES } from "@/constants/routes";
 import { LANDING_SECTIONS } from "@/features/marketing/sections";
 import { getCurrentUser } from "@/lib/services/user-service";
 
@@ -54,17 +57,34 @@ export default async function MarketingLayout({
             small screens can jump between sections. It also keeps the footer
             from simply repeating the tagline the closing headline just said.
           */}
-          <nav aria-label="Sections" className="flex flex-wrap gap-x-6 gap-y-2">
-            {LANDING_SECTIONS.map((section) => (
-              <a
-                key={section.href}
-                href={section.href}
+          <div className="flex flex-col gap-3 sm:items-end">
+            <nav aria-label="Sections" className="flex flex-wrap gap-x-6 gap-y-2">
+              {LANDING_SECTIONS.map((section) => (
+                <a
+                  key={section.href}
+                  href={section.href}
+                  className="landing-mono rounded-sm transition-colors duration-200 hover:text-white/80"
+                >
+                  {section.label}
+                </a>
+              ))}
+            </nav>
+
+            <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2">
+              <Link
+                href={ROUTES.privacy}
                 className="landing-mono rounded-sm transition-colors duration-200 hover:text-white/80"
               >
-                {section.label}
-              </a>
-            ))}
-          </nav>
+                Privacy Policy
+              </Link>
+              <Link
+                href={ROUTES.terms}
+                className="landing-mono rounded-sm transition-colors duration-200 hover:text-white/80"
+              >
+                Terms of Service
+              </Link>
+            </nav>
+          </div>
         </div>
       </footer>
     </div>

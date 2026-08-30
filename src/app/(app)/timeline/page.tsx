@@ -52,7 +52,7 @@ export default async function TimelinePage({ searchParams }: PageProps) {
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Timeline</h1>
         <p className="text-sm text-muted-foreground">
-          Every journal moment — started, finished, rated, reviewed.
+          Started, finished, rated, reviewed, in the order it happened.
         </p>
       </header>
 

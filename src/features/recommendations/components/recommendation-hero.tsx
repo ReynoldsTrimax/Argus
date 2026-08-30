@@ -24,7 +24,7 @@ const STRENGTH_COPY: Record<
   },
   sparse: {
     badge: "Learning",
-    line: "Only a few titles to go on so far — expect these to sharpen quickly.",
+    line: "Only a few titles to go on so far, so expect these to sharpen quickly.",
   },
   moderate: {
     badge: "Tuned",
@@ -32,7 +32,7 @@ const STRENGTH_COPY: Record<
   },
   rich: {
     badge: "Well tuned",
-    line: "A deep library to read from — ranking leans hard on your own patterns.",
+    line: "A deep library to read from, so the ranking leans hard on your own patterns.",
   },
 };
 
@@ -133,7 +133,7 @@ export function RecommendationHero({ run }: { run: RecommendationRun }) {
 
         <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed text-pretty">
           {run.mode === "personalized"
-            ? "Built from your library, ratings and viewing habits — including what you dropped. Every row says why it is here."
+            ? "Built from your library, ratings and viewing habits, including what you dropped. Every row says why it is here."
             : strength.line}
         </p>
       </div>

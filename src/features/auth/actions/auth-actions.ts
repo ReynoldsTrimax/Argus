@@ -20,7 +20,7 @@ function getOriginFromHeaders(headerStore: Headers): string {
 
 /** Message shown when the auth service accepts a connection but never replies. */
 const AUTH_UNREACHABLE =
-  "Can't reach the authentication service. It may be paused or restarting — check your Supabase project status, then try again.";
+  "Can't reach the authentication service. It may be paused or restarting. Check your Supabase project status, then try again.";
 
 /** Message shown when Supabase credentials are absent or malformed. */
 const AUTH_UNCONFIGURED =

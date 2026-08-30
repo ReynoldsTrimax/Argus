@@ -67,7 +67,7 @@ function Header() {
     <header className="space-y-1">
       <h1 className="font-display text-2xl font-semibold tracking-tight">Genres</h1>
       <p className="text-sm text-muted-foreground">
-        Dive into a mood — from science fiction to horror.
+        Pick a mood. Science fiction, horror, and everything in between.
       </p>
     </header>
   );

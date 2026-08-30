@@ -26,7 +26,7 @@ export default async function CollectionsPage() {
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Collections</h1>
         <p className="text-sm text-muted-foreground">
-          Build themed shelves — Nolan, comfort movies, date night, and more.
+          Build themed shelves: a Nolan run, comfort movies, date night.
         </p>
       </header>
 

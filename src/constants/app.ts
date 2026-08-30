@@ -4,7 +4,7 @@
 export const APP_NAME = "Argus";
 export const APP_TAGLINE = "See everything you watch";
 export const APP_DESCRIPTION =
-  "Discover, organize, track, and understand every movie, show, and series — in one calm, cinematic place.";
+  "Every film and series you watch, with your progress, ratings and notes kept in one place.";
 
 /** Default metadata for SEO and social sharing. */
 export const APP_METADATA = {

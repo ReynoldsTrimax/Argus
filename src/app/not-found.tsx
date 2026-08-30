@@ -23,8 +23,8 @@ export default function NotFound() {
           Page not found
         </h1>
         <p className="mt-2 max-w-md text-sm text-muted-foreground text-pretty">
-          That page doesn&apos;t exist — or it hasn&apos;t been written yet. Try search
-          with ⌘K.
+          That page doesn&apos;t exist, or it hasn&apos;t been built yet. Try search with
+          ⌘K.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button asChild>
