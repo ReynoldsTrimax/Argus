@@ -18,9 +18,20 @@ interface FilterBarProps {
   showRuntime?: boolean;
 }
 
+/**
+ * Sort choices.
+ *
+ * `vote_average.desc` leads and is the default because it is what people mean by
+ * "most popular" — the titles a large audience rated highly, not whatever TMDB's
+ * popularity churn is pushing this week. It is only usable at all because the
+ * filter layer attaches a vote-count floor to it; see `CREDIBILITY_VOTE_FLOOR`.
+ *
+ * `popularity.desc` is kept as "Trending now", which is what that metric
+ * actually measures.
+ */
 const SORT_OPTIONS: { value: MediaSortBy; label: string }[] = [
-  { value: "popularity.desc", label: "Popularity" },
-  { value: "vote_average.desc", label: "Highest rated" },
+  { value: "vote_average.desc", label: "Most popular" },
+  { value: "popularity.desc", label: "Trending now" },
   { value: "release_date.desc", label: "Newest" },
   { value: "release_date.asc", label: "Oldest" },
   { value: "title.asc", label: "A–Z" },
@@ -150,7 +161,7 @@ export function FilterBar({ genres = [], showRuntime }: FilterBarProps) {
       ) : null}
 
       <Select
-        value={(searchParams.get("sort") as MediaSortBy) ?? "popularity.desc"}
+        value={(searchParams.get("sort") as MediaSortBy) ?? "vote_average.desc"}
         onValueChange={(v) => update("sort", v)}
       >
         <SelectTrigger className="w-full sm:w-[11rem]" aria-label="Sort by">
