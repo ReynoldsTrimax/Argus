@@ -63,7 +63,7 @@ export function IntelligenceSection() {
     >
       <SectionHeader
         title="Your taste, measured."
-        lead="Hours, streaks, distributions, completion rates — plus an explainable Decision Score for anything you are still deciding about."
+        lead="Hours, streaks, distributions and completion rates. Plus a Decision Score for the title you keep putting off, with the reasoning behind it."
       />
 
       <div className="mt-14 grid gap-4 sm:mt-16 lg:grid-cols-12">
@@ -147,7 +147,7 @@ export function IntelligenceSection() {
 
             <p className="mt-5 max-w-[26rem] text-xs leading-relaxed text-white/60">
               Weighted from your ratings, genre history, runtime tolerance and completion
-              rate — and it always shows its reasoning.
+              rate. The breakdown is always on screen.
             </p>
 
             {/* The reasoning itself, as tick meters — distinct from the smooth

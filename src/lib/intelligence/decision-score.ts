@@ -187,7 +187,7 @@ export function computeDecisionScore(
       : score >= 70
         ? "Likely worth your time"
         : score >= 50
-          ? "Mixed signals — sample carefully"
+          ? "Mixed signals, so sample carefully"
           : "Below your usual preferences";
 
   const sorted = [...reasons].sort((a, b) => b.weight - a.weight).slice(0, 6);

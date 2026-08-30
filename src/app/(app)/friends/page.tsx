@@ -58,8 +58,8 @@ export default async function FriendsPage() {
         <h1 className="text-page-title">Friends</h1>
         <p className="text-muted-foreground text-sm">
           Follow what people you know are watching. Your username is{" "}
-          <span className="text-foreground font-medium">@{profile?.username ?? "—"}</span>{" "}
-          — share it so friends can find you.
+          <span className="text-foreground font-medium">@{profile?.username ?? "—"}</span>
+          . Share it so friends can find you.
         </p>
       </header>
 

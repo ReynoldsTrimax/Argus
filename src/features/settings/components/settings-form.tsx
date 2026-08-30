@@ -80,8 +80,8 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           <div>
             <h2 className="text-sm font-semibold tracking-tight">Appearance</h2>
             <p className="text-sm text-muted-foreground">
-              Argus is dark by design — there is no light mode. Adjust density and motion
-              below.
+              Argus is dark by design, so there is no light mode. Adjust density and
+              motion below.
             </p>
           </div>
           <FormField

@@ -45,7 +45,7 @@ export default async function LibrarySearchPage({ searchParams }: PageProps) {
 
       {!q.trim() ? (
         <p className="text-sm text-muted-foreground">
-          Type a query and press Enter. Searches your personal data only — not the full
+          Type a query and press Enter. This searches your own library, not the full
           catalog (use ⌘K for that).
         </p>
       ) : null}

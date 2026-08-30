@@ -27,7 +27,7 @@ const STATUS = [
 const ORGANISERS = [
   {
     key: "Collections",
-    body: "Group anything — a director run, a rewatch queue, a “someday” shelf.",
+    body: "Group anything: a director run, a rewatch queue, a “someday” shelf.",
   },
   {
     key: "Tags",

@@ -102,8 +102,8 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         <div className="space-y-1">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Library</h1>
           <p className="text-sm text-muted-foreground">
-            Filter by status, rating, year, genre, runtime — answer questions about your
-            taste.
+            Filter by status, rating, year, genre or runtime to answer questions about
+            your taste.
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
@@ -125,7 +125,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         <EmptyState
           icon={Library}
           title="No matching titles"
-          description="Try clearing smart filters or add titles from Discover."
+          description="Try clearing the filters, or add titles from Discover."
         />
       ) : (
         <>

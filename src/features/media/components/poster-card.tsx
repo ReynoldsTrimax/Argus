@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 import { posterUrl } from "@/lib/media/image";
-import { formatVote, formatYear } from "@/lib/media/format";
+import { formatNumber, formatVote, formatYear } from "@/lib/media/format";
 import { mediaHref } from "@/lib/media/routes";
 import { actionUpsertAndSetStatus } from "@/features/library/actions/library-actions";
 import type { MediaSummary } from "@/types/media";
@@ -23,6 +23,12 @@ interface PosterCardProps {
   size?: "sm" | "md" | "lg";
   /** Show Plan / Watching / Completed on hover (default true). */
   quickActions?: boolean;
+  /** Position in a ranked shelf. Takes the audience-score badge's corner. */
+  rank?: number;
+  /** IMDb score for ranked shelves — shown instead of the TMDB star. */
+  imdbRating?: number | null;
+  /** IMDb vote count, shown in the caption in place of the media type. */
+  imdbVotes?: number | null;
 }
 
 const sizeClass = {
@@ -85,6 +91,9 @@ export function PosterCard({
   priority,
   size = "md",
   quickActions = true,
+  rank,
+  imdbRating,
+  imdbVotes,
 }: PosterCardProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
@@ -157,7 +166,9 @@ export function PosterCard({
           href={href}
           prefetch
           className="focus-visible:ring-ring absolute inset-0 z-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
-          aria-label={`${item.title}${year ? `, ${year}` : ""}`}
+          aria-label={`${rank != null ? `#${rank} ` : ""}${item.title}${
+            year ? `, ${year}` : ""
+          }${imdbRating != null ? `, IMDb ${imdbRating.toFixed(1)}` : ""}`}
         >
           {src ? (
             <>
@@ -192,11 +203,29 @@ export function PosterCard({
           )}
         />
 
-        {item.voteAverage != null && item.voteAverage > 0 ? (
+        {rank != null ? (
+          <span className="pointer-events-none absolute top-0 left-0 z-[1] rounded-br-lg bg-black/80 px-2 py-1 font-mono text-xs font-semibold text-white tabular-nums backdrop-blur-sm">
+            {rank}
+          </span>
+        ) : item.voteAverage != null && item.voteAverage > 0 ? (
           <div className="pointer-events-none absolute top-2 left-2 z-[1] inline-flex items-center gap-1 rounded-md bg-black/65 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
             <Star className="fill-primary text-primary h-3 w-3" aria-hidden="true" />
             {formatVote(item.voteAverage)}
           </div>
+        ) : null}
+
+        {/* Steps aside for the quick actions, which claim the same corner on hover */}
+        {imdbRating != null ? (
+          <span
+            className={cn(
+              "pointer-events-none absolute bottom-1.5 left-1.5 z-[1] inline-flex items-center",
+              "gap-1 rounded bg-[#f5c518] px-1.5 py-0.5 text-[10px] font-bold text-black",
+              "transition-opacity duration-200 ease-out",
+              showActions ? "opacity-0" : "opacity-100",
+            )}
+          >
+            IMDb {imdbRating.toFixed(1)}
+          </span>
         ) : null}
 
         <AnimatePresence>
@@ -294,7 +323,11 @@ export function PosterCard({
         <p className="text-muted-foreground text-xs">
           {year ?? "—"}
           <span className="mx-1 opacity-40">·</span>
-          {item.mediaType === "tv" ? "TV" : "Movie"}
+          {imdbVotes
+            ? `${formatNumber(imdbVotes)} votes`
+            : item.mediaType === "tv"
+              ? "TV"
+              : "Movie"}
         </p>
       </Link>
     </motion.div>

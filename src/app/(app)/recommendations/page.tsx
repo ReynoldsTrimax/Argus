@@ -79,7 +79,7 @@ export default async function RecommendationsPage({ searchParams }: PageProps) {
       <footer className="border-border/60 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
         <p className="text-muted-foreground text-xs">
           {run.mode === "personalized"
-            ? "Ranked deterministically from your own library — no AI, no other users' data."
+            ? "Ranked from your own library. Nobody else's data goes into it."
             : "General picks. This page becomes personal as soon as you start tracking titles."}
         </p>
         <div className="flex gap-2">

@@ -26,7 +26,7 @@ export default async function FavoritesPage() {
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Favorites</h1>
         <p className="text-sm text-muted-foreground">
-          Independent from watch status — heart anything you love.
+          Heart anything you love, finished or not.
         </p>
       </header>
 

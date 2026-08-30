@@ -126,7 +126,7 @@ export async function runRecommendationEngine(
         sections: assembleColdStartSections(scored, provisional, { includeFactors }),
         candidateCount: candidates.length,
         notice:
-          "Argus has no viewing history to learn from yet, so these are general picks rather than personal ones.",
+          "Nothing in your library to go on yet, so these are general picks rather than personal ones.",
       },
       debug: { ...emptyDebug, poolSize: candidates.length, scoredSize: scored.length },
     };
@@ -151,7 +151,7 @@ export async function runRecommendationEngine(
     const fallbackScored = scorePool(fallback, profile, { now });
     sections = assembleColdStartSections(fallbackScored, profile, { includeFactors });
     notice =
-      "Not enough catalog matches for your library yet — showing general picks while Argus fills in.";
+      "Not enough catalog matches for your library yet, so these are general picks for now.";
   }
 
   return {

@@ -11,7 +11,7 @@ const CAPABILITIES = [
   {
     icon: Clapperboard,
     title: "Cinematic catalog",
-    body: "Films, series, anime, documentaries and limited series — with galleries, trailers, cast, collections and streaming availability.",
+    body: "Films, series, anime, documentaries and limited series, with galleries, trailers, cast, collections and streaming availability.",
   },
   {
     icon: Layers,
